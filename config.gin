@@ -1,0 +1,6 @@
+DataPrepper.img_dataframe=None
+DataPrepper.data_dir=None
+DataPrepper.remake_dirs=False
+DataPrepper.label_col=None
+DataPrepper.train=0.60
+

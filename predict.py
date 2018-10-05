@@ -1,13 +1,9 @@
 import sys
 import os
 import csv
-from configparser import ConfigParser
 import numpy as np
-import h5py
 from tqdm import tqdm
 import tensorflow as tf
-import random
-from tensorflow.keras.preprocessing import image
 from tensorflow.keras import models
 
 DATA_PATH = '../../data/'
@@ -20,7 +16,6 @@ IMG_RESIZE_Y = 512
 PREDICTIONS = []
 
 
-#load model
 model = models.load_model('../models/baseline_classifier.h5')
 
 def prepare_img(filename):
@@ -62,6 +57,3 @@ def main():
         writer.writerow([HEADER[0],HEADER[1]])
         for result in PREDICTIONS:
             writer.writerow([result[0],result[1]])
-
-if __name__ == '__main__':
-    main()
