@@ -1,6 +1,28 @@
-DataPrepper.img_dataframe=None
-DataPrepper.data_dir=None
-DataPrepper.remake_dirs=False
-DataPrepper.label_col=None
-DataPrepper.train=0.60
+FilePrep.remake_dirs=True
+FilePrep.label_col='class'
+FilePrep.train=0.60
 
+simple_CNN.input_values = (16, 16, 1)
+simple_CNN.output = 3
+
+set_dir_flow_generator.image_size=(16,16)
+set_dir_flow_generator.batch_size=32
+set_dir_flow_generator.color_mode='grayscale'
+set_dir_flow_generator.class_mode='categorical'
+set_dir_flow_generator.shuffle=True
+set_dir_flow_generator.seed=42
+set_dir_flow_generator.interpolation='lanczos'
+
+call_fit_gen.steps_per_epoch=16
+call_fit_gen.epochs=100
+call_fit_gen.callbacks=None
+call_fit_gen.validation_data=None
+call_fit_gen.validation_steps=8
+call_fit_gen.class_weight=None
+call_fit_gen.max_queue_size=10
+call_fit_gen.workers=1
+call_fit_gen.use_multiprocessing=False
+
+#TB_LOG_DIR = "../logs/"
+#CHECKPOINT_FILENAME = "../checkpoints/Baseline_{}.hdf5".format(time.strftime("%Y%m%d_%H%M%S"))# Save Keras model to this file
+#MODEL_FILENAME = "../models/Baseline_model.h5"

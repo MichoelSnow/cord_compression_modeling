@@ -19,7 +19,7 @@
       <paths name="gferguso@10.85.9.131:22">
         <serverdata>
           <mappings>
-            <mapping deploy="/home/gferguso/Projects/Cord_compression" local="$PROJECT_DIR$" web="/" />
+            <mapping deploy="/data/gferguso/cord_comp" local="$PROJECT_DIR$" web="/" />
           </mappings>
         </serverdata>
       </paths>

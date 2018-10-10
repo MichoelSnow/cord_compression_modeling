@@ -3,7 +3,7 @@ from keras import backend as K
 import tensorflow as tf
 import numpy as np
 import sklearn
-
+import gin
 
 class ConfusionMatrix(Callback):
 
@@ -36,7 +36,7 @@ class ConfusionMatrix(Callback):
         print(template.format("", "Total predicted", np.sum(
             cm[:, 0]), np.sum(cm[:, 1]), np.sum(cm[:, 2]), ""))
 
-
+@gin.configurable
 def F1_score(y_true, y_pred, smooth=1.0):
     intersection = tf.reduce_sum(y_true * y_pred)
     union = tf.reduce_sum(y_true + y_pred)
@@ -45,7 +45,7 @@ def F1_score(y_true, y_pred, smooth=1.0):
     F1 = numerator / denominator
     return tf.reduce_mean(F1)
 
-
+@gin.configurable
 def dice_coef_loss(y_true, y_pred, smooth=1.):
     y_true_f = K.flatten(y_true)
     y_pred_f = K.flatten(y_pred)
@@ -55,13 +55,13 @@ def dice_coef_loss(y_true, y_pred, smooth=1.):
                           K.sum(y_pred_f) + smooth))
     return loss
 
-
+@gin.configurable
 def sensitivity(y_true, y_pred, smooth=1.):
     intersection = tf.reduce_sum(y_true * y_pred)
     coef = (intersection + smooth) / (tf.reduce_sum(y_true) + smooth)
     return coef
 
-
+@gin.configurable
 def specificity(y_true, y_pred, smooth=1.):
     intersection = tf.reduce_sum(y_true * y_pred)
     coef = (intersection + smooth) / (tf.reduce_sum(y_pred) + smooth)
