@@ -1,3 +1,4 @@
+FilePrep.project_dir='/data/gferguso/cord_comp/'
 FilePrep.remake_dirs=True
 FilePrep.label_col='class'
 FilePrep.train=0.60

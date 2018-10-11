@@ -6,8 +6,8 @@ from sklearn.model_selection import train_test_split
 
 @gin.configurable
 class FilePrep:
-    def __init__(self, img_dataframe=None, remake_dirs=False, label_col=None, train=0.60):
-        self.data_dir = os.path.join(os.getcwd(), 'images')
+    def __init__(self, project_dir=None, img_dataframe=None, remake_dirs=False, label_col=None, train=0.60):
+        self.data_dir = os.path.join(project_dir, 'images')
         assert isinstance(img_dataframe, pd.DataFrame), f'{img_dataframe} must be a Dataframe.'
         self.data = img_dataframe.drop(columns=label_col)
         self.labels = img_dataframe[label_col]
@@ -61,22 +61,21 @@ class FilePrep:
             path_classes = [train_path, test_path, valid_path]
             self._make_dirs(path_classes)
             train_files =  data_dict['img_train'][data_dict['label_train'] == label]['image_paths'].tolist()
-            print(train_files)
             for file in train_files:
-                if not os.path.exists(file):
-                    _, f_name = os.path.split(file)
-                    file_dest = os.path.join(train_path, f_name)
+                _, f_name = os.path.split(file)
+                file_dest = os.path.join(train_path, f_name)
+                if not os.path.exists(file_dest):
                     shutil.copy(file, file_dest)
             test_files =  data_dict['img_test'][data_dict['label_test'] == label]['image_paths'].tolist()
             for file in test_files:
-                if not os.path.exists(file):
-                    _, f_name = os.path.split(file)
-                    file_dest = os.path.join(test_path, f_name)
+                _, f_name = os.path.split(file)
+                file_dest = os.path.join(test_path, f_name)
+                if not os.path.exists(file_dest):
                     shutil.copy(file, file_dest)
             valid_files =  data_dict['img_val'][data_dict['label_val'] == label]['image_paths'].tolist()
             for file in valid_files:
-                if not os.path.exists(file):
-                    _, f_name = os.path.split(file)
-                    file_dest = os.path.join(valid_path, f_name)
+                _, f_name = os.path.split(file)
+                file_dest = os.path.join(valid_path, f_name)
+                if not os.path.exists(file_dest):
                     shutil.copy(file, file_dest)
         print('Directory structure built and train/test/validation files moved to directories.')
