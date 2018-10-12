@@ -14,4 +14,4 @@ def set_loss():
 
 @gin.configurable
 def set_metrics():
-    return [F1_score, sensitivity, specificity]
+    return [F1_score, sensitivity, specificity, 'accuracy']

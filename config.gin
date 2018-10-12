@@ -1,29 +1,35 @@
 FilePrep.project_dir='/data/gferguso/cord_comp/'
-FilePrep.remake_dirs=True
+FilePrep.remake_dirs=False
 FilePrep.label_col='class'
 FilePrep.train=0.60
 
-simple_CNN.input_values = (16, 16, 1)
-simple_CNN.output = 3
+simple_CNN.input_values=(256, 256, 1)
+simple_CNN.output=3
+dense_net169.input_values=(256, 256, 3)
+simple_sep_CNN.input_values=(128, 128, 1)
+simple_sep_CNN.output=3
 
-set_dir_flow_generator.image_size=(16,16)
-set_dir_flow_generator.batch_size=32
+set_dir_flow_generator.image_size=(128,128)
+set_dir_flow_generator.batch_size=50
 set_dir_flow_generator.color_mode='grayscale'
 set_dir_flow_generator.class_mode='categorical'
 set_dir_flow_generator.shuffle=True
 set_dir_flow_generator.seed=42
 set_dir_flow_generator.interpolation='lanczos'
 
-call_fit_gen.steps_per_epoch=16
-call_fit_gen.epochs=100
-call_fit_gen.callbacks=None
-call_fit_gen.validation_data=None
-call_fit_gen.validation_steps=8
+call_fit_gen.steps_per_epoch=6
+call_fit_gen.epochs=1
+call_fit_gen.validation_steps=4
 call_fit_gen.class_weight=None
 call_fit_gen.max_queue_size=10
 call_fit_gen.workers=1
 call_fit_gen.use_multiprocessing=False
 
-#TB_LOG_DIR = "../logs/"
-#CHECKPOINT_FILENAME = "../checkpoints/Baseline_{}.hdf5".format(time.strftime("%Y%m%d_%H%M%S"))# Save Keras model to this file
-#MODEL_FILENAME = "../models/Baseline_model.h5"
+save_model.model=None
+save_model.model_name='test.h5'
+
+set_keras_callbacks.calls=None
+set_keras_callbacks.batch_size=50
+
+#load_images.image_dir_path
+

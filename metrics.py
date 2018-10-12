@@ -6,22 +6,20 @@ import sklearn
 import gin
 
 class ConfusionMatrix(Callback):
-
-    def __init__(self, x, y_true, num_classes):
+    #def __init__(self, val_data=None, val_labels=None, batch_size=None):
+    def __init__(self, val_gen=None, val_labels=None, batch_size=None):
         super().__init__()
-
-        self.x = x
-        self.y_true = y_true
-        self.num_classes = num_classes
+        self.validation_data = val_gen
+        self.validation_labels = val_labels
+        self.batch_size = batch_size
 
     def on_epoch_end(self, epoch, logs=None):
-        print("Calculating confusion matrix...")
-        predicted = self.model.predict(
-            self.x, verbose=1, batch_size=batch_size)
+        # !!!! A bug in keras keeps self.validation from ever being set with a generator
+        print("Calculating confusion matrix")
+        predicted = self.model.predict_generator(self.validation_data , max_queue_size=50, verbose=1)
         predicted = np.argmax(predicted, axis=1)
-        ground = np.argmax(self.y_true, axis=1)
-        cm = sklearn.metrics.confusion_matrix(
-            ground, predicted, labels=None, sample_weight=None)
+        ground = np.argmax(self.validation_labels, axis=1)
+        cm = sklearn.metrics.confusion_matrix(ground, predicted, labels=None, sample_weight=None)
         template = "{0:10}|{1:30}|{2:10}|{3:30}|{4:15}|{5:15}"
         print(template.format("", "", "", "Predicted", "", ""))
         print(template.format("", "", "Normal",
@@ -46,16 +44,6 @@ def F1_score(y_true, y_pred, smooth=1.0):
     return tf.reduce_mean(F1)
 
 @gin.configurable
-def dice_coef_loss(y_true, y_pred, smooth=1.):
-    y_true_f = K.flatten(y_true)
-    y_pred_f = K.flatten(y_pred)
-    intersection = K.sum(y_true_f * y_pred_f)
-    loss = -K.log(2. * intersection + smooth) + \
-           K.log((K.sum(y_true_f) +
-                          K.sum(y_pred_f) + smooth))
-    return loss
-
-@gin.configurable
 def sensitivity(y_true, y_pred, smooth=1.):
     intersection = tf.reduce_sum(y_true * y_pred)
     coef = (intersection + smooth) / (tf.reduce_sum(y_true) + smooth)
@@ -66,3 +54,13 @@ def specificity(y_true, y_pred, smooth=1.):
     intersection = tf.reduce_sum(y_true * y_pred)
     coef = (intersection + smooth) / (tf.reduce_sum(y_pred) + smooth)
     return coef
+
+@gin.configurable
+def dice_coef_loss(y_true, y_pred, smooth=1.):
+    y_true_f = K.flatten(y_true)
+    y_pred_f = K.flatten(y_pred)
+    intersection = K.sum(y_true_f * y_pred_f)
+    loss = -K.log(2. * intersection + smooth) + \
+           K.log((K.sum(y_true_f) +
+                  K.sum(y_pred_f) + smooth))
+    return loss

@@ -1,59 +1,35 @@
-import sys
+import keras
 import os
-import csv
-import numpy as np
-from tqdm import tqdm
-import tensorflow as tf
-from tensorflow.keras import models
+import gin
 
-DATA_PATH = '../../data/'
-HEADER = ['patientId','PredictionString']
-PREDICT_PATH = '../predictions/baseline_tony.csv'
-CONFIDENCE = '0.9' #? not sure
-CHANNELS = 3
-IMG_RESIZE_X = 512
-IMG_RESIZE_Y = 512
-PREDICTIONS = []
+# Images functions
+@gin.configurable
+def load_images(image_dir_path=None):
+    images = os.listdir(image_dir_path)
+    return images
 
+@gin.configurable
+def preprocessing(image_size=(512,512)):
+    return image_size
 
-model = models.load_model('../models/baseline_classifier.h5')
+# Model functions
+@gin.configurable
+def load_model(model_name=None, model_path=None):
+    load_path = os.path.join(model_path, model_name)
+    model = keras.models.load_model(load_path)
+    return model
 
-def prepare_img(filename):
-    image_string = tf.read_file(filename)
-    image = tf.image.decode_png(image_string, channels=CHANNELS) # Don't use tf.image.decode_image
-    image = tf.image.convert_image_dtype(image, tf.float32) #convert to float values in [0, 1]
-    image = tf.image.resize_images(image, [IMG_RESIZE_X, IMG_RESIZE_Y])
-    image = image[np.newaxis,...] #add on that tricky batch axis
-    return image
+@gin.configurable
+def evaluate_model(image_path=None, image_labels=None, model_name=None, model_path=None, batch_size=32):
+    images = load_images(image_dir_path=image_path)
+    model = load_model(model_name=model_name, model_path=model_path)
+    evaluation = model.evaluate(x=images, y=image_labels, batch_size=batch_size, steps=1, verbose=0)
+    return evaluation
 
-def inference(img_path, model, data_path=None):
-    """Send an img and model, preprocess the img to training standards, then return a pred"""
-    img = prepare_img(img_path)
-    pred_prob = model.predict(img, batch_size=None, steps=1, verbose=0)
-    print('='*50)
-    print(pred_prob)
-    print(pred_prob[0])
-    print(pred_prob[0][0])
-    print('='*50)
-    sys.exit()
-    return pred_prob[0][0]
+@gin.configurable
+def infer_classes(image_path=None, model_name=None, model_path=None, batch_size=32):
+    images = load_images(image_dir_path=image_path)
+    model = load_model(model_name=model_name, model_path=model_path)
+    pred_prob = model.predict(images, batch_size=batch_size, steps=1, verbose=0)
+    return pred_prob
 
-def main():
-    directory = os.fsencode(DATA_PATH + 'stage1-test-png/')  #non google cloud = stage_1_test_pngs
-    for png in tqdm(os.listdir(directory)):
-        filename = os.fsdecode(png)
-        patient_id = filename[0:-4] #clip '.png'
-        png_path = os.path.join(DATA_PATH + 'stage1-test-png/', filename)
-        pred_class = inference(png_path, model)
-        if pred_class == 2:
-            box = ' '.join(map(str, gen_rand_box()))
-            PREDICTIONS.append((parient_id, CONFIDENCE + ' ' + box))
-            # PREDICTIONS.append((patient_id,CONFIDENCE + ' ' + BOX_1 + ' ' + CONFIDENCE + ' ' + BOX_2))
-        else: #class 1 or 0
-            PREDICTIONS.append((patient_id,None))
-
-    with open(PREDICT_PATH,'w') as out_file:
-        writer = csv.writer(out_file)
-        writer.writerow([HEADER[0],HEADER[1]])
-        for result in PREDICTIONS:
-            writer.writerow([result[0],result[1]])

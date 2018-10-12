@@ -19,21 +19,100 @@ def simple_CNN(input_values=(None, None, 1), output=3):
     model = keras.Model(inputs=input, outputs=pred)
     return model
 
+@gin.configurable
+def simple_sep_CNN(input_values=(None, None, 1), output=3):
+    ''' A simple CNN for testing'''
+    input     = keras.layers.Input(shape=(input_values[0], input_values[1], input_values[2]), name='scnn_input')
+    conv1     = keras.layers.SeparableConv2D(filters=32, kernel_size=(3, 3), activation='relu',use_bias=True,
+                                    kernel_initializer='he_uniform')(input)
+    max_pool1 = keras.layers.MaxPooling2D(pool_size=(2,2))(conv1)
+    conv2     = keras.layers.SeparableConv2D(filters=64, kernel_size=(3, 3), activation='relu',use_bias=True,
+                                    kernel_initializer='he_uniform')(max_pool1)
+    max_pool2 = keras.layers.MaxPooling2D(pool_size=(1,1))(conv2)
+    conv3     = keras.layers.SeparableConv2D(filters=64, kernel_size=(3,3), activation='relu',use_bias=True,
+                                    kernel_initializer='he_uniform')(max_pool2)
+    flatten   = keras.layers.Flatten()(conv3)
+    dense1    = keras.layers.Dense(64, activation='relu', use_bias=True, kernel_initializer='he_uniform')(flatten)
+    pred      = keras.layers.Dense(output, activation='softmax', use_bias=True, kernel_initializer='he_uniform')(dense1)
+    model = keras.Model(inputs=input, outputs=pred)
+    return model
 
-def dense_net169(self,img_x,img_y,channels,label_shape,classes=3):
+
+@gin.configurable
+def multiscale_network():
+    pass
+    # # main CNN model - CNN1
+    # main_model = Sequential()
+    # main_model.add(Convolution2D(32, 3, 3, input_shape=(3, 224, 224)))
+    # main_model.add(Activation('relu'))
+    # main_model.add(MaxPooling2D(pool_size=(2, 2)))
+    #
+    # main_model.add(Convolution2D(32, 3, 3))
+    # main_model.add(Activation('relu'))
+    # main_model.add(MaxPooling2D(pool_size=(2, 2)))
+    #
+    # main_model.add(Convolution2D(64, 3, 3))
+    # main_model.add(Activation('relu'))
+    # main_model.add(MaxPooling2D(pool_size=(2, 2)))  # the main_model so far outputs 3D feature maps (height, width, features)
+    #
+    # main_model.add(Flatten())
+    #
+    # # lower features model - CNN2
+    # lower_model1 = Sequential()
+    # lower_model1.add(Convolution2D(32, 3, 3, input_shape=(3, 224, 224)))
+    # lower_model1.add(Activation('relu'))
+    # lower_model1.add(MaxPooling2D(pool_size=(2, 2)))
+    # lower_model1.add(Flatten())
+    #
+    # # lower features model - CNN3
+    # lower_model2 = Sequential()
+    # lower_model2.add(Convolution2D(32, 3, 3, input_shape=(3, 224, 224)))
+    # lower_model2.add(Activation('relu'))
+    # lower_model2.add(MaxPooling2D(pool_size=(2, 2)))
+    # lower_model2.add(Flatten())
+    #
+    # # merged model
+    # merged_model = Merge([main_model, lower_model1, lower_model2], mode='concat')
+    #
+    # final_model = Sequential()
+    # final_model.add(merged_model)
+    # final_model.add(Dense(64))
+    # final_model.add(Activation('relu'))
+    # final_model.add(Dropout(0.5))
+    # final_model.add(Dense(1))
+    # final_model.add(Activation('sigmoid'))
+    # final_model.compile(loss='binary_crossentropy', optimizer='rmsprop', metrics=['accuracy'])
+
+    # print
+    # 'About to start training merged CNN'
+    # train_datagen = ImageDataGenerator(rescale=1. / 255, shear_range=0.2, zoom_range=0.2, horizontal_flip=True)
+    # train_generator = train_datagen.flow_from_directory(train_data_dir, target_size=(224, 224), batch_size=32,
+    #                                                     class_mode='binary')
+    #
+    # test_datagen = ImageDataGenerator(rescale=1. / 255)
+    # test_generator = test_datagen.flow_from_directory(args.test_images, target_size=(224, 224), batch_size=32,
+    #                                                   class_mode='binary')
+    #
+    # final_train_generator = zip(train_generator, train_generator, train_generator)
+    # final_test_generator = zip(test_generator, test_generator, test_generator)
+    # final_model.fit_generator(final_train_generator, samples_per_epoch=nb_train_samples, nb_epoch=nb_epoch,
+    #                           validation_data=final_test_generator, nb_val_samples=nb_validation_samples)
+
+@gin.configurable
+def dense_net169(input_values=(None, None, 3), classes=3):
     """ A DenseNet169 Model from Keras."""
     DenseNet169 = keras.applications.densenet.DenseNet169(include_top=False,
-                                                          weights='imagenet',
+                                                          weights=None,
                                                           input_tensor=None,
-                                                          input_shape=(img_x, img_y, channels),
+                                                          input_shape=(input_values[0],input_values[1],input_values[2]),
                                                           pooling='max',
                                                           classes=classes)
     last_layer = DenseNet169.output
-    preds = keras.layers.Dense(label_shape[-1], activation='sigmoid')(last_layer)
+    preds = keras.layers.Dense(classes, activation='sigmoid')(last_layer)
     model = keras.Model(DenseNet169.input, preds)
     return model
 
-def _resnet_layer(self, inputs, fmaps, name):
+def _resnet_layer(inputs, fmaps, name):
     """
     Residual layer block
     """
