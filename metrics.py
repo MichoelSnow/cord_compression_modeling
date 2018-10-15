@@ -6,19 +6,20 @@ import sklearn
 import gin
 
 class ConfusionMatrix(Callback):
-    #def __init__(self, val_data=None, val_labels=None, batch_size=None):
-    def __init__(self, val_gen=None, val_labels=None, batch_size=None):
+    def __init__(self, val_gen=None, batch_size=None):
+        # !!!! A bug in keras keeps self.validation (in the Callback class) from ever being set with a generator,
+        # used classes from the validation generator instead
         super().__init__()
+        val_gen.reset()
         self.validation_data = val_gen
-        self.validation_labels = val_labels
+        self.validation_labels = val_gen.classes
         self.batch_size = batch_size
 
     def on_epoch_end(self, epoch, logs=None):
-        # !!!! A bug in keras keeps self.validation from ever being set with a generator
         print("Calculating confusion matrix")
-        predicted = self.model.predict_generator(self.validation_data , max_queue_size=50, verbose=1)
+        predicted = self.model.predict_generator(self.validation_data, verbose=1)
         predicted = np.argmax(predicted, axis=1)
-        ground = np.argmax(self.validation_labels, axis=1)
+        ground = self.validation_labels
         cm = sklearn.metrics.confusion_matrix(ground, predicted, labels=None, sample_weight=None)
         template = "{0:10}|{1:30}|{2:10}|{3:30}|{4:15}|{5:15}"
         print(template.format("", "", "", "Predicted", "", ""))

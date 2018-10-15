@@ -3,27 +3,25 @@ FilePrep.remake_dirs=False
 FilePrep.label_col='class'
 FilePrep.train=0.60
 
-simple_CNN.input_values=(256, 256, 1)
-simple_CNN.output=3
-dense_net169.input_values=(256, 256, 3)
-simple_sep_CNN.input_values=(128, 128, 1)
-simple_sep_CNN.output=3
+set_input_output.input_shape=(256, 256, 1)
+set_input_output.output_shape=(3)
 
-set_dir_flow_generator.image_size=(128,128)
-set_dir_flow_generator.batch_size=50
+set_dir_flow_generator.batch_size=25
 set_dir_flow_generator.color_mode='grayscale'
 set_dir_flow_generator.class_mode='categorical'
 set_dir_flow_generator.shuffle=True
 set_dir_flow_generator.seed=42
-set_dir_flow_generator.interpolation='lanczos'
+set_dir_flow_generator.interpolation='nearest'
 
-call_fit_gen.steps_per_epoch=6
-call_fit_gen.epochs=1
-call_fit_gen.validation_steps=4
+call_fit_gen.steps_per_epoch=12
+call_fit_gen.epochs=2
+call_fit_gen.validation_steps=8
 call_fit_gen.class_weight=None
-call_fit_gen.max_queue_size=10
+call_fit_gen.max_queue_size=50
 call_fit_gen.workers=1
 call_fit_gen.use_multiprocessing=False
+
+set_adam.lr= 0.001
 
 save_model.model=None
 save_model.model_name='test.h5'

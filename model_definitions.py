@@ -2,16 +2,23 @@ import keras
 import gin
 
 @gin.configurable
+def set_input_output(input_shape=(None, None, None), output_shape=(None)):
+    image_size=(input_shape[0], input_shape[1])
+    in_shape = input_shape
+    out_shape = output_shape[0]
+    return image_size, in_shape, out_shape
+
+@gin.configurable
 def simple_CNN(input_values=(None, None, 1), output=3):
     ''' A simple CNN for testing'''
     input     = keras.layers.Input(shape=(input_values[0], input_values[1], input_values[2]), name='scnn_input')
-    conv1     = keras.layers.Conv2D(filters=32, kernel_size=(3, 3), activation='relu',use_bias=True,
+    conv1     = keras.layers.Conv2D(filters=64, kernel_size=(5, 5), activation='relu',use_bias=True,
                                     kernel_initializer='he_uniform')(input)
     max_pool1 = keras.layers.MaxPooling2D(pool_size=(2,2))(conv1)
     conv2     = keras.layers.Conv2D(filters=64, kernel_size=(3, 3), activation='relu',use_bias=True,
                                     kernel_initializer='he_uniform')(max_pool1)
-    max_pool2 = keras.layers.MaxPooling2D(pool_size=(1,1))(conv2)
-    conv3     = keras.layers.Conv2D(filters=64, kernel_size=(3,3), activation='relu',use_bias=True,
+    max_pool2 = keras.layers.MaxPooling2D(pool_size=(2,2))(conv2)
+    conv3     = keras.layers.Conv2D(filters=32, kernel_size=(3,3), activation='relu',use_bias=True,
                                     kernel_initializer='he_uniform')(max_pool2)
     flatten   = keras.layers.Flatten()(conv3)
     dense1    = keras.layers.Dense(64, activation='relu', use_bias=True, kernel_initializer='he_uniform')(flatten)
@@ -23,20 +30,43 @@ def simple_CNN(input_values=(None, None, 1), output=3):
 def simple_sep_CNN(input_values=(None, None, 1), output=3):
     ''' A simple CNN for testing'''
     input     = keras.layers.Input(shape=(input_values[0], input_values[1], input_values[2]), name='scnn_input')
-    conv1     = keras.layers.SeparableConv2D(filters=32, kernel_size=(3, 3), activation='relu',use_bias=True,
-                                    kernel_initializer='he_uniform')(input)
-    max_pool1 = keras.layers.MaxPooling2D(pool_size=(2,2))(conv1)
+    conv1     = keras.layers.SeparableConv2D(filters=128, kernel_size=(5, 5), activation='relu',use_bias=True,
+                                             kernel_initializer='he_uniform')(input)
+    max_pool1 = keras.layers.MaxPooling2D(pool_size=(3,3))(conv1)
     conv2     = keras.layers.SeparableConv2D(filters=64, kernel_size=(3, 3), activation='relu',use_bias=True,
-                                    kernel_initializer='he_uniform')(max_pool1)
-    max_pool2 = keras.layers.MaxPooling2D(pool_size=(1,1))(conv2)
-    conv3     = keras.layers.SeparableConv2D(filters=64, kernel_size=(3,3), activation='relu',use_bias=True,
-                                    kernel_initializer='he_uniform')(max_pool2)
+                                             kernel_initializer='he_uniform')(max_pool1)
+    max_pool2 = keras.layers.MaxPooling2D(pool_size=(2,2))(conv2)
+    conv3     = keras.layers.SeparableConv2D(filters=32, kernel_size=(3,3), activation='relu',use_bias=True,
+                                             kernel_initializer='he_uniform')(max_pool2)
     flatten   = keras.layers.Flatten()(conv3)
     dense1    = keras.layers.Dense(64, activation='relu', use_bias=True, kernel_initializer='he_uniform')(flatten)
     pred      = keras.layers.Dense(output, activation='softmax', use_bias=True, kernel_initializer='he_uniform')(dense1)
     model = keras.Model(inputs=input, outputs=pred)
     return model
 
+@gin.configurable
+def deep_sep_CNN(input_values=(None, None, 1), output=3):
+    ''' A simple CNN for testing'''
+    input     = keras.layers.Input(shape=(input_values[0], input_values[1], input_values[2]), name='scnn_input')
+    conv1     = keras.layers.SeparableConv2D(filters=64, kernel_size=(3, 3), activation='relu',use_bias=True,
+                                             kernel_initializer='he_uniform')(input)
+    max_pool1 = keras.layers.MaxPooling2D(pool_size=(2,2))(conv1)
+    conv2     = keras.layers.SeparableConv2D(filters=64, kernel_size=(3, 3), activation='relu',use_bias=True,
+                                             kernel_initializer='he_uniform')(max_pool1)
+    max_pool2 = keras.layers.MaxPooling2D(pool_size=(2,2))(conv2)
+    conv3     = keras.layers.SeparableConv2D(filters=32, kernel_size=(3,3), activation='relu',use_bias=True,
+                                             kernel_initializer='he_uniform')(max_pool2)
+    conv4     = keras.layers.SeparableConv2D(filters=32, kernel_size=(3,3), activation='relu',use_bias=True,
+                                             kernel_initializer='he_uniform')(conv3)
+    conv5     = keras.layers.SeparableConv2D(filters=32, kernel_size=(3,3), activation='relu',use_bias=True,
+                                             kernel_initializer='he_uniform')(conv4)
+    conv6     = keras.layers.SeparableConv2D(filters=32, kernel_size=(3,3), activation='relu',use_bias=True,
+                                             kernel_initializer='he_uniform')(conv5)
+    flatten   = keras.layers.Flatten()(conv6)
+    dense1    = keras.layers.Dense(64, activation='relu', use_bias=True, kernel_initializer='he_uniform')(flatten)
+    pred      = keras.layers.Dense(output, activation='softmax', use_bias=True, kernel_initializer='he_uniform')(dense1)
+    model = keras.Model(inputs=input, outputs=pred)
+    return model
 
 @gin.configurable
 def multiscale_network():
@@ -180,47 +210,4 @@ def resnet(self, dropout=0.5):
 
     return model
 
-# # https://www.tensorflow.org/api_docs/python/tf/train/AdamOptimizer
-# optimizer = tf.train.AdamOptimizer(learning_rate=LEARNING_RATE,
-#         beta1=ADAM_B1,
-#         beta2=ADAM_B2)
-#
-# optimizer_keras = tf.keras.optimizers.Adam(lr=LEARNING_RATE,
-#         beta_1=ADAM_B1,
-#         beta_2=ADAM_B2,
-#         decay=0.10)
-#
-# # https://www.tensorflow.org/api_docs/python/tf/keras/callbacks/ModelCheckpoint
-# checkpointer = tf.keras.callbacks.ModelCheckpoint(filepath=CHECKPOINT_FILENAME,
-#         monitor="val_loss",
-#         verbose=1,
-#         save_best_only=True)
-#
-# # https://www.tensorflow.org/api_docs/python/tf/keras/callbacks/TensorBoard
-# #TODO custom tensorboard log file names..... or write to unqiue dir as a sub dir in the logs file...
-# tensorboard = tf.keras.callbacks.TensorBoard(log_dir=TB_LOG_DIR,
-#         # histogram_freq=1, #this screwed us over... caused tensorboard callback to fail.. why??? DEBUG !!!!!!
-#         # batch_size=BATCH_SIZE, # and take this out... and boom.. histogam frequency works. sob
-#         write_graph=True,
-#         write_grads=False,
-#         write_images=True)
-#
-# print("Compiling Model!")
-# model.compile(optimizer=optimizer_keras,
-#         loss='binary_crossentropy',
-#         metrics=['accuracy'])
-#
-# print("Beginning to Train Model")
-# model.fit(train_dataset,
-#         epochs=EPOCHS,
-#         steps_per_epoch=(len(train_labels)//BATCH_SIZE), #36808 train number
-#         verbose=1,
-#         validation_data=valid_dataset,
-#         validation_steps= (len(valid_labels)//BATCH_SIZE),  #3197 validation number
-#         callbacks=[checkpointer,tensorboard])  #https://towardsdatascience.com/learning-rate-schedules-and-adaptive-learning-rate-methods-for-deep-learning-2c8f433990d1
-#
-#
-# # Save entire model to a HDF5 file
-# model.save(MODEL_FILENAME)
-# # # Recreate the exact same model, including weights and optimizer.
-# # model = keras.models.load_model('my_model.h5')
+
