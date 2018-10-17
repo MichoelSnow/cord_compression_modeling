@@ -1,10 +1,11 @@
 import pandas as pd
 import gin
 from data_prep import FilePrep
-from model_definitions import set_input_output, simple_CNN, simple_sep_CNN, deep_sep_CNN
+from model_definitions.simple_models import set_input_output, simple_sep_CNN
+from model_definitions.resnet50 import ResNet50
 from model_comp import comp_model
 from generators import set_dir_flow_generator
-from train import call_fit_gen, save_model
+
 
 def run():
     gin.parse_config_file('config.gin')
@@ -15,7 +16,8 @@ def run():
     image_size, in_shape, out_shape = set_input_output()
 
     # Add a model
-    cnn_model = deep_sep_CNN(input_values=in_shape, output=out_shape)
+    #cnn_model = simple_sep_CNN(input_values=in_shape, output=out_shape)
+    cnn_model = ResNet50(in_shape=in_shape, out_shape=out_shape)
     comp_model(model=cnn_model)
     cnn_model.summary()
 

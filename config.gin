@@ -18,21 +18,21 @@ set_dir_flow_generator.shuffle=True
 set_dir_flow_generator.seed=42
 set_dir_flow_generator.interpolation='nearest'
 
-call_fit_gen.steps_per_epoch=12
-call_fit_gen.epochs=2
-call_fit_gen.validation_steps=8
-call_fit_gen.class_weight=None
-call_fit_gen.max_queue_size=50
-call_fit_gen.workers=1
-call_fit_gen.use_multiprocessing=False
+#call_fit_gen.steps_per_epoch=12
+#call_fit_gen.epochs=2
+#call_fit_gen.validation_steps=8
+#call_fit_gen.class_weight=None
+#call_fit_gen.max_queue_size=50
+#call_fit_gen.workers=1
+#call_fit_gen.use_multiprocessing=False
 
 set_adam.lr= 0.001
 
-save_model.model=None
-save_model.model_name='test.h5'
+#save_model.model=None
+#save_model.model_name='test.h5'
 
-set_keras_callbacks.calls=None
-set_keras_callbacks.batch_size=50
+#set_keras_callbacks.calls=None
+#set_keras_callbacks.batch_size=50
 
 #load_images.image_dir_path
 
