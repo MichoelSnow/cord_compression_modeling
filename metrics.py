@@ -57,6 +57,10 @@ def specificity(y_true, y_pred, smooth=1.):
     return coef
 
 @gin.configurable
+def muilticlass_logloss(y_true, y_pred):
+    return tf.losses.log_loss(y_true, y_pred)
+
+@gin.configurable
 def dice_coef_loss(y_true, y_pred, smooth=1.):
     y_true_f = K.flatten(y_true)
     y_pred_f = K.flatten(y_pred)

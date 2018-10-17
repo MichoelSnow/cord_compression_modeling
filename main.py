@@ -1,7 +1,8 @@
 import pandas as pd
 import gin
 from data_prep import FilePrep
-from model_definitions.simple_models import set_input_output, simple_sep_CNN
+from model_definitions.model_utils import set_input_output
+from model_definitions.simple_models import simple_sep_CNN
 from model_definitions.resnet50 import ResNet50
 from model_comp import comp_model
 from generators import set_dir_flow_generator

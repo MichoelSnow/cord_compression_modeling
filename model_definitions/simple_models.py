@@ -2,13 +2,6 @@ import keras
 import gin
 
 @gin.configurable
-def set_input_output(input_shape=(None, None, None), output_shape=(None)):
-    image_size=(input_shape[0], input_shape[1])
-    in_shape = input_shape
-    out_shape = output_shape
-    return image_size, in_shape, out_shape
-
-@gin.configurable
 def simple_CNN(in_shape=(None, None, 1), output=3):
     ''' A simple CNN for testing'''
     input     = keras.layers.Input(shape=(in_shape[0], in_shape[1], in_shape[2]), name='scnn_input')
