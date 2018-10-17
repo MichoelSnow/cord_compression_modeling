@@ -1,7 +1,11 @@
 FilePrep.project_dir='/data/gferguso/cord_comp/'
-FilePrep.remake_dirs=False
-FilePrep.label_col='class'
+FilePrep.remake_dirs=True
 FilePrep.train=0.60
+build_dataset.label_df_name='stage_1_detailed_class_info.csv'
+build_dataset.file_type='png'
+build_dataset.file_name_col='patientId'
+build_dataset.label_col='class'
+build_dataset.image_paths_col='image_paths'
 
 set_input_output.input_shape=(256, 256, 1)
 set_input_output.output_shape=(3)

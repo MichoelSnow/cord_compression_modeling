@@ -9,8 +9,8 @@ def load_images(image_dir_path=None):
     return images
 
 @gin.configurable
-def preprocessing(image_size=(512,512)):
-    return image_size
+def preprocessing():
+    pass
 
 # Model functions
 @gin.configurable
