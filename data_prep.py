@@ -28,7 +28,6 @@ class FilePrep:
         data = pd.merge(files_df, labels_df, how='inner', on=file_name_col)
         data = data.drop_duplicates(subset=[file_name_col, image_paths_col])
         data_no_id = data.drop(columns=[file_name_col])
-        #path_class = data_no_id.to_csv('path_class.csv', index=False)
         return data_no_id
 
     def _make_dirs(self, paths):
@@ -63,11 +62,11 @@ class FilePrep:
         return data_dict
 
     @gin.configurable
-    def build_dataset(self, label_df_name='stage_1_detailed_class_info.csv', file_type='png', file_name_col='patientId',
-                      label_col=None, image_paths_col='image_paths', base_data_dir='/data/gferguso/cord_comp/Current_data_subset'):
+    def build_dataset(self, label_df_name=None, file_type=None, file_name_col=None, label_col=None,
+                      image_paths_col=None, base_data_dir=None):
         data_labels = self._make_class_df(label_df_name=label_df_name, file_type=file_type, file_name_col=file_name_col,
                                           image_paths_col=image_paths_col,base_data_dir=base_data_dir)
-        data_labels.to_csv(os.path.join(self.proj_image_dir, 'names_labels'))
+        #data_labels.to_csv(os.path.join(self.proj_image_dir, 'names_labels'))
         train_base = os.path.join(self.proj_image_dir , 'train')
         test_base  = os.path.join(self.proj_image_dir , 'test')
         valid_base = os.path.join(self.proj_image_dir , 'validate')

@@ -15,8 +15,6 @@ def run():
     image_size, in_shape, out_shape = set_input_output()
 
     # Add a model
-    #cnn_model = simple_CNN()
-    #cnn_model = dense_net169()
     cnn_model = deep_sep_CNN(input_values=in_shape, output=out_shape)
     comp_model(model=cnn_model)
     cnn_model.summary()
