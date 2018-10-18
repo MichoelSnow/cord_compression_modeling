@@ -1,5 +1,6 @@
 import os
 import pandas as pd
+import numpy as np
 import gin
 import shutil
 from sklearn.model_selection import train_test_split
@@ -46,7 +47,7 @@ class FilePrep:
                     print(f'Directory {path} already exists. To remake set remake_dirs=True.')
 
     def unique_label_names(self, labels):
-            return labels.unique()
+        return np.sort(labels.unique())
 
     def _train_test_val(self, data_labels_df, image_paths_col=None, label_col=None):
         img_train, img_test_val, label_train, label_test_val  = train_test_split(data_labels_df[image_paths_col],

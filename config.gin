@@ -1,7 +1,7 @@
 FilePrep.project_dir='/data/gferguso/cord_comp/'
 FilePrep.remake_dirs=False
 FilePrep.train=0.60
-build_dataset.base_data_dir='/data/gferguso/cord_comp/Current_data_subset'
+build_dataset.base_data_dir='/data/gferguso/cord_comp/Small_data_subset'
 build_dataset.label_df_name='stage_1_detailed_class_info.csv'
 build_dataset.file_type='png'
 build_dataset.file_name_col='patientId'
@@ -18,21 +18,19 @@ set_dir_flow_generator.shuffle=True
 set_dir_flow_generator.seed=42
 set_dir_flow_generator.interpolation='nearest'
 
-#call_fit_gen.steps_per_epoch=12
-#call_fit_gen.epochs=2
-#call_fit_gen.validation_steps=8
-#call_fit_gen.class_weight=None
-#call_fit_gen.max_queue_size=50
-#call_fit_gen.workers=1
-#call_fit_gen.use_multiprocessing=False
+call_fit_gen.steps_per_epoch=300
+call_fit_gen.epochs=50
+call_fit_gen.validation_steps=100
+call_fit_gen.class_weight=None
+call_fit_gen.max_queue_size=50
+call_fit_gen.workers=1
+call_fit_gen.use_multiprocessing=False
 
-set_adam.lr= 0.001
+set_adam.lr=0.001
 
-#save_model.model=None
-#save_model.model_name='test.h5'
+save_model.model=None
+save_model.model_name='test.h5'
 
-#set_keras_callbacks.calls=None
-#set_keras_callbacks.batch_size=50
-
-#load_images.image_dir_path
+set_keras_callbacks.calls=None
+set_keras_callbacks.batch_size=50
 
