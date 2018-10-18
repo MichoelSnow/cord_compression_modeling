@@ -1,0 +1,9 @@
+pandas>=0.23
+numpy>=1.14
+scikit-learn>=0.20.0
+keras>=2.2
+gin-config>=0.1.1.2
+SimpleITK>=1.1.0
+python=3.6.6
+opencv-python>=3.4
+pydicom>=1.2
