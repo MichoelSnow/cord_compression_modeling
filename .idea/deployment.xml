@@ -9,31 +9,10 @@
           </mappings>
         </serverdata>
       </paths>
-      <paths name="fdl-core">
-        <serverdata>
-          <mappings>
-            <mapping local="$PROJECT_DIR$" web="/" />
-          </mappings>
-        </serverdata>
-      </paths>
       <paths name="gferguso@10.85.9.130:22">
         <serverdata>
           <mappings>
-            <mapping deploy="/data/gferguso/cord_comp" local="$PROJECT_DIR$" />
-          </mappings>
-        </serverdata>
-      </paths>
-      <paths name="gferguso@10.85.9.130:22 (1)">
-        <serverdata>
-          <mappings>
             <mapping local="$PROJECT_DIR$" web="/" />
-          </mappings>
-        </serverdata>
-      </paths>
-      <paths name="gferguso@10.85.9.131:22">
-        <serverdata>
-          <mappings>
-            <mapping deploy="/data/gferguso/cord_comp" local="$PROJECT_DIR$" web="/" />
           </mappings>
         </serverdata>
       </paths>
