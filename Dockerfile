@@ -12,8 +12,6 @@ RUN apt-get update && apt-get install -y --allow-downgrades --no-install-recomme
          git \
          libjpeg-dev \
          libpng-dev \
-         libnccl2\
-         libnccl-dev \
          python-qt4 \
          sudo \
          unzip \
@@ -27,7 +25,11 @@ RUN usermod -aG sudo cordcomp
 WORKDIR /opt
 RUN chown cordcomp /opt
 USER cordcomp
-WORKDIR /home/cordcomp
+WORKDIR /home/cordcomp/cord_comp
+
+COPY *.py /home/cordcomp/cord_comp
+COPY ./model_definitions/*.py /home/cordcomp/cord_comp
+COPY config.gin /home/cordcomp/cord_comp
 
 ENV PYTHON_VERSION=3.6
 RUN curl -o ~/miniconda.sh -O  https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh  && \
@@ -39,6 +41,7 @@ RUN curl -o ~/miniconda.sh -O  https://repo.continuum.io/miniconda/Miniconda3-la
 RUN /opt/conda/bin/conda clean -ya
 
 ENV PATH /opt/conda/bin:$PATH
-RUN conda install -y jupyter opencv bcolz tqdm matplotlib scipy seaborn graphviz python-graphviz keras pandas shutil
+RUN conda install -y jupyter opencv bcolz tqdm matplotlib scipy seaborn graphviz python-graphviz keras pandas
 RUN pip install sklearn-pandas isoweek pandas-summary gin-config
+RUN pip install /home/cordcomp/cord_comp/setup.py
 ENTRYPOINT ["bash"]

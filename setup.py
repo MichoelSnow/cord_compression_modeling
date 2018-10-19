@@ -3,6 +3,8 @@ from setuptools import setup, find_packages
 with open('requirements.txt') as req_file:
     required = req_file.read().splitlines()
 
+print(required)
+
 setup(
     name='cord_comp',
     version='0.0.0.0.0.0.0.3',
