@@ -19,7 +19,7 @@ def run():
 
     # Add a model
     #cnn_model = simple_sep_CNN(input_values=in_shape, output=out_shape)
-    cnn_model = ResNet50(in_shape=in_shape, out_shape=out_shape)
+    cnn_model = ResNet50(in_shape=in_shape, classes=out_shape)
     comp_model(model=cnn_model)
     cnn_model.summary()
 

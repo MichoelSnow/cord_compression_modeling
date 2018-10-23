@@ -1,4 +1,5 @@
 import keras
+import gin
 
 @gin.configurable
 def multiscale_network():

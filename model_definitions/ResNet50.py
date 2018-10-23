@@ -50,7 +50,7 @@ def conv_block(input_tensor, kernel_size, filters, stage, block, strides=(2, 2))
     conv_name_base = 'res' + str(stage) + block + '_branch'
     bn_name_base = 'bn' + str(stage) + block + '_branch'
     x = keras.layers.Conv2D(filters1, (1, 1), strides=strides, kernel_initializer='he_normal',
-                      name=conv_name_base + '2a')(input_tensor)
+                            name=conv_name_base + '2a')(input_tensor)
     x = keras.layers.BatchNormalization(axis=3, name=bn_name_base + '2a')(x)
     x = keras.layers.Activation('relu')(x)
     x = keras.layers.Conv2D(filters2, kernel_size, padding='same', kernel_initializer='he_normal',
@@ -67,8 +67,7 @@ def conv_block(input_tensor, kernel_size, filters, stage, block, strides=(2, 2))
     x = keras.layers.Activation('relu')(x)
     return x
 
-
-def ResNet50(in_shape=None, pooling=None, out_shape=3):
+def ResNet50(in_shape=None, pooling=None, classes=3):
     """Instantiates the ResNet50 architecture."""
     img_input = keras.layers.Input(shape=in_shape)
     x = keras.layers.ZeroPadding2D(padding=(3, 3), name='conv1_pad')(img_input)
@@ -100,7 +99,7 @@ def ResNet50(in_shape=None, pooling=None, out_shape=3):
 
     if not pooling:
         x = keras.layers.GlobalAveragePooling2D(name='avg_pool')(x)
-        x = keras.layers.Dense(out_shape, activation='softmax', name='fc')(x)
+        x = keras.layers.Dense(classes, activation='softmax', name='fc')(x)
     else:
         if pooling == 'avg':
             x = keras.layers.GlobalAveragePooling2D()(x)

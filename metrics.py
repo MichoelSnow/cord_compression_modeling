@@ -65,7 +65,5 @@ def dice_coef_loss(y_true, y_pred, smooth=1.):
     y_true_f = K.flatten(y_true)
     y_pred_f = K.flatten(y_pred)
     intersection = K.sum(y_true_f * y_pred_f)
-    loss = -K.log(2. * intersection + smooth) + \
-           K.log((K.sum(y_true_f) +
-                  K.sum(y_pred_f) + smooth))
+    loss = -K.log(2. * intersection + smooth) + K.log((K.sum(y_true_f) + K.sum(y_pred_f) + smooth))
     return loss
