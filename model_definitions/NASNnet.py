@@ -49,87 +49,68 @@ def NASNet(input_shape=None, penultimate_filters=4032, num_blocks=6, stem_block_
 
 def reduction_a_cell(ip, p, filters, block_id=None):
     '''Adds a Reduction cell for NASNet-A (Fig. 4 in the paper).'''
-
-    with keras.backend.name_scope('reduction_A_block_%s' % block_id):
-        p = _adjust_block(p, ip, filters, block_id)
+    with keras.backend.name_scope(f'reduction_A_block_{block_id}'):
+        p = adjust_block(p, ip, filters, block_id)
 
         h = keras.layers.Activation('relu')(ip)
-        h = keras.layers.Conv2D(filters, (1, 1), strides=(1, 1), padding='same', name='reduction_conv_1_%s' % block_id,
+        h = keras.layers.Conv2D(filters, (1, 1), strides=(1, 1), padding='same', name=f'reduction_conv_1_{block_id}',
                                 use_bias=False, kernel_initializer='he_normal')(h)
-        h = keras.layers.BatchNormalization(axis=3, momentum=0.9997, epsilon=1e-3,
-                                            name='reduction_bn_1_%s' % block_id)(h)
-        h3 = keras.layers.ZeroPadding2D(padding=correct_pad(keras.backend, h, 3), name='reduction_pad_1_%s' % block_id)(h)
+        h = keras.layers.BatchNormalization(axis=3, momentum=0.9997, epsilon=1e-3, name=f'reduction_bn_1_{block_id}')(h)
+        h3 = keras.layers.ZeroPadding2D(padding=correct_pad(h, 3), name=f'reduction_pad_1_{block_id}')(h)
 
         with keras.backend.name_scope('block_1'):
-            x1_1 = _separable_conv_block(h, filters, (5, 5), strides=(2, 2), block_id='reduction_left1_%s' % block_id)
-            x1_2 = _separable_conv_block(p, filters, (7, 7), strides=(2, 2), block_id='reduction_right1_%s' % block_id)
+            x1_1 = separable_conv_block(h, filters, (5, 5), strides=(2, 2), block_id=f'reduction_left1_{block_id}')
+            x1_2 = separable_conv_block(p, filters, (7, 7), strides=(2, 2), block_id=f'reduction_right1_{block_id}')
             x1 = keras.layers.add([x1_1, x1_2], name='reduction_add_1_%s' % block_id)
 
         with keras.backend.name_scope('block_2'):
             x2_1 = keras.layers.MaxPooling2D((3, 3), strides=(2, 2), padding='valid',
                                              name='reduction_left2_%s' % block_id)(h3)
-            x2_2 = _separable_conv_block(p, filters, (7, 7), strides=(2, 2), block_id='reduction_right2_%s' % block_id)
+            x2_2 = separable_conv_block(p, filters, (7, 7), strides=(2, 2), block_id=f'reduction_right2_{block_id}')
             x2 = keras.layers.add([x2_1, x2_2], name='reduction_add_2_%s' % block_id)
 
         with keras.backend.name_scope('block_3'):
             x3_1 = keras.layers.AveragePooling2D((3, 3), strides=(2, 2), padding='valid',
                                                  name='reduction_left3_%s' % block_id)(h3)
-            x3_2 = _separable_conv_block(p, filters, (5, 5), strides=(2, 2), block_id='reduction_right3_%s' % block_id)
+            x3_2 = separable_conv_block(p, filters, (5, 5), strides=(2, 2), block_id=f'reduction_right3_{block_id}')
             x3 = keras.layers.add([x3_1, x3_2], name='reduction_add3_%s' % block_id)
 
         with keras.backend.name_scope('block_4'):
             x4 = keras.layers.AveragePooling2D((3, 3),strides=(1, 1), padding='same',
-                                               name='reduction_left4_%s' % block_id)(x1)
+                                               name=f'reduction_left4_{block_id}')(x1)
             x4 = keras.layers.add([x2, x4])
 
         with keras.backend.name_scope('block_5'):
-            x5_1 = _separable_conv_block(x1, filters, (3, 3), block_id='reduction_left4_%s' % block_id)
+            x5_1 = separable_conv_block(x1, filters, (3, 3), block_id='reduction_left4_%s' % block_id)
             x5_2 = keras.layers.MaxPooling2D((3, 3), strides=(2, 2), padding='valid',
-                                             name='reduction_right5_%s' % block_id)(h3)
-            x5 = keras.layers.add([x5_1, x5_2], name='reduction_add4_%s' % block_id)
+                                             name=f'reduction_right5_{block_id}')(h3)
+            x5 = keras.layers.add([x5_1, x5_2], name=f'reduction_add4_{block_id}')
 
-        x = keras.layers.concatenate(
-            [x2, x3, x4, x5],
-            axis=3,
-            name='reduction_concat_%s' % block_id)
+        x = keras.layers.concatenate([x2, x3, x4, x5], axis=3, name='reduction_concat_{block_id}')
         return x, ip
 
-def _separable_conv_block(ip, filters, kernel_size=(3, 3), strides=(1, 1), block_id=None):
-    with keras.backend.name_scope('separable_conv_block_%s' % block_id):
+def separable_conv_block(ip, filters, kernel_size=(3, 3), strides=(1, 1), block_id=None):
+    with keras.backend.name_scope(f'separable_conv_block_{block_id}'):
         x = keras.layers.Activation('relu')(ip)
         if strides == (2, 2):
-            x = keras.layers.ZeroPadding2D(
-                padding=correct_pad(x, kernel_size),
-                name='separable_conv_1_pad_%s' % block_id)(x)
+            x = keras.layers.ZeroPadding2D(padding=correct_pad(x, kernel_size),
+                                           name=f'separable_conv_1_pad_{block_id}')(x)
             conv_pad = 'valid'
         else:
             conv_pad = 'same'
-        x = keras.layers.SeparableConv2D(filters, kernel_size,
-                                   strides=strides,
-                                   name='separable_conv_1_%s' % block_id,
-                                   padding=conv_pad, use_bias=False,
-                                   kernel_initializer='he_normal')(x)
-        x = keras.layers.BatchNormalization(
-            momentum=0.9997,
-            epsilon=1e-3,
-            name='separable_conv_1_bn_%s' % (block_id))(x)
+        x = keras.layers.SeparableConv2D(filters, kernel_size,strides=strides, name=f'separable_conv_1_{block_id}',
+                                         padding=conv_pad, use_bias=False, depthwise_initializer='he_normal',
+                                         pointwise_initializer='he_normal')(x)
+        x = keras.layers.BatchNormalization(momentum=0.9997, epsilon=1e-3, name='separable_conv_1_bn_{block_id}')(x)
         x = keras.layers.Activation('relu')(x)
-        x = keras.layers.SeparableConv2D(filters, kernel_size,
-                                   name='separable_conv_2_%s' % block_id,
-                                   padding='same',
-                                   use_bias=False,
-                                   kernel_initializer='he_normal')(x)
-        x = keras.layers.BatchNormalization(
-            momentum=0.9997,
-            epsilon=1e-3,
-            name='separable_conv_2_bn_%s' % (block_id))(x)
+        x = keras.layers.SeparableConv2D(filters, kernel_size,name=f'separable_conv_2_{block_id}', padding='same',
+                                         use_bias=False, depthwise_initializer='he_normal',
+                                         pointwise_initializer='he_normal')(x)
+        x = keras.layers.BatchNormalization(momentum=0.9997, epsilon=1e-3, name='separable_conv_2_bn_{block_id}')(x)
     return x
 
-def _adjust_block(p, ip, filters, block_id=None):
-    channel_dim = 1 if keras.backend.image_data_format() == 'channels_first' else -1
-    img_dim = 2 if keras.backend.image_data_format() == 'channels_first' else -2
+def adjust_block(p, ip, filters, block_id=None):
     ip_shape = keras.backend.int_shape(ip)
-
     if p is not None:
         p_shape = keras.backend.int_shape(p)
 
@@ -137,43 +118,26 @@ def _adjust_block(p, ip, filters, block_id=None):
         if p is None:
             p = ip
 
-        elif p_shape[img_dim] != ip_shape[img_dim]:
-            with keras.backend.name_scope('adjust_reduction_block_%s' % block_id):
-                p = keras.layers.Activation('relu',
-                                      name='adjust_relu_1_%s' % block_id)(p)
-                p1 = keras.layers.AveragePooling2D(
-                    (1, 1),
-                    strides=(2, 2),
-                    padding='valid',
-                    name='adjust_avg_pool_1_%s' % block_id)(p)
-                p1 = keras.layers.Conv2D(
-                    filters // 2, (1, 1),
-                    padding='same',
-                    use_bias=False, name='adjust_conv_1_%s' % block_id,
-                    kernel_initializer='he_normal')(p1)
+        elif p_shape[-2] != ip_shape[-2]:
+            with keras.backend.name_scope('adjust_reduction_block_{block_id}'):
+                p = keras.layers.Activation('relu', name=f'adjust_relu_1_{block_id}')(p)
+                p1 = keras.layers.AveragePooling2D((1, 1),strides=(2, 2), padding='valid',
+                                                   name='adjust_avg_pool_1_{block_id}')(p)
+                p1 = keras.layers.Conv2D(filters // 2, (1, 1), padding='same', use_bias=False,
+                                         name=f'adjust_conv_1_{block_id}', kernel_initializer='he_normal')(p1)
 
                 p2 = keras.layers.ZeroPadding2D(padding=((0, 1), (0, 1)))(p)
                 p2 = keras.layers.Cropping2D(cropping=((1, 0), (1, 0)))(p2)
-                p2 = keras.layers.AveragePooling2D(
-                    (1, 1),
-                    strides=(2, 2),
-                    padding='valid',
-                    name='adjust_avg_pool_2_%s' % block_id)(p2)
-                p2 = keras.layers.Conv2D(
-                    filters // 2, (1, 1),
-                    padding='same',
-                    use_bias=False,
-                    name='adjust_conv_2_%s' % block_id,
-                    kernel_initializer='he_normal')(p2)
+                p2 = keras.layers.AveragePooling2D((1, 1), strides=(2, 2), padding='valid',
+                                                   name=f'adjust_avg_pool_2_{block_id}')(p2)
+                p2 = keras.layers.Conv2D(filters // 2, (1, 1),padding='same', use_bias=False,
+                                         name=f'adjust_conv_2_{block_id}', kernel_initializer='he_normal')(p2)
 
                 p = keras.layers.concatenate([p1, p2])
-                p = keras.layers.BatchNormalization(
-                    momentum=0.9997,
-                    epsilon=1e-3,
-                    name='adjust_bn_%s' % block_id)(p)
+                p = keras.layers.BatchNormalization(momentum=0.9997, epsilon=1e-3, name=f'adjust_bn_{block_id}')(p)
 
-        elif p_shape[channel_dim] != filters:
-            with keras.backend.name_scope('adjust_projection_block_%s' % block_id):
+        elif p_shape[-1] != filters:
+            with keras.backend.name_scope(f'adjust_projection_block_{block_id}'):
                 p = keras.layers.Activation('relu')(p)
                 p = keras.layers.Conv2D(filters, (1, 1), strides=(1, 1), padding='same',
                                         name=f'adjust_conv_projection_{block_id}', use_bias=False,
@@ -181,63 +145,54 @@ def _adjust_block(p, ip, filters, block_id=None):
                 p = keras.layers.BatchNormalization(momentum=0.9997, epsilon=1e-3, name=f'adjust_bn_{block_id}')(p)
     return p
 
-def _normal_a_cell(ip, p, filters, block_id=None):
+def normal_a_cell(ip, p, filters, block_id=None):
     '''Adds a Normal cell for NASNet-A (Fig. 4 in the paper).'''
-    with keras.backend.name_scope('normal_A_block_%s' % block_id):
-        p = _adjust_block(p, ip, filters, block_id)
+    with keras.backend.name_scope(f'normal_A_block_{block_id}'):
+        p = adjust_block(p, ip, filters, block_id)
 
         h = keras.layers.Activation('relu')(ip)
-        h = keras.layers.Conv2D(filters, (1, 1), strides=(1, 1), padding='same', name='normal_conv_1_%s' % block_id,
+        h = keras.layers.Conv2D(filters, (1, 1), strides=(1, 1), padding='same', name=f'normal_conv_1_{block_id}',
                                 use_bias=False, kernel_initializer='he_normal')(h)
-        h = keras.layers.BatchNormalization(axis=3, momentum=0.9997, epsilon=1e-3, name='normal_bn_1_%s' % block_id)(h)
+        h = keras.layers.BatchNormalization(axis=3, momentum=0.9997, epsilon=1e-3, name=f'normal_bn_1_{block_id}')(h)
 
         with keras.backend.name_scope('block_1'):
-            x1_1 = _separable_conv_block( h, filters, kernel_size=(5, 5), block_id='normal_left1_%s' % block_id)
-            x1_2 = _separable_conv_block( p, filters, block_id='normal_right1_%s' % block_id)
-            x1 = keras.layers.add([x1_1, x1_2], name='normal_add_1_%s' % block_id)
+            x1_1 = separable_conv_block(h, filters, kernel_size=(5, 5), block_id='normal_left1_{block_id}')
+            x1_2 = separable_conv_block(p, filters, block_id=f'normal_right1_{block_id}')
+            x1 = keras.layers.add([x1_1, x1_2], name=f'normal_add_1_{block_id}')
 
         with keras.backend.name_scope('block_2'):
-            x2_1 = _separable_conv_block(p, filters, (5, 5), block_id='normal_left2_%s' % block_id)
-            x2_2 = _separable_conv_block(p, filters, (3, 3), block_id='normal_right2_%s' % block_id)
-            x2 = keras.layers.add([x2_1, x2_2], name='normal_add_2_%s' % block_id)
+            x2_1 = separable_conv_block(p, filters, (5, 5), block_id=f'normal_left2_{block_id}')
+            x2_2 = separable_conv_block(p, filters, (3, 3), block_id=f'normal_right2_{block_id}')
+            x2 = keras.layers.add([x2_1, x2_2], name='normal_add_2_{block_id}')
 
         with keras.backend.name_scope('block_3'):
             x3 = keras.layers.AveragePooling2D((3, 3), strides=(1, 1), padding='same',
-                                               name='normal_left3_%s' % (block_id))(h)
-            x3 = keras.layers.add([x3, p], name='normal_add_3_%s' % block_id)
+                                               name=f'normal_left3_{block_id}')(h)
+            x3 = keras.layers.add([x3, p], name=f'normal_add_3_{block_id}')
 
         with keras.backend.name_scope('block_4'):
             x4_1 = keras.layers.AveragePooling2D((3, 3), strides=(1, 1), padding='same',
-                                                 name='normal_left4_%s' % (block_id))(p)
+                                                 name=f'normal_left4_{block_id}')(p)
             x4_2 = keras.layers.AveragePooling2D((3, 3), strides=(1, 1), padding='same',
-                                                 name='normal_right4_%s' % (block_id))(p)
-            x4 = keras.layers.add([x4_1, x4_2], name='normal_add_4_%s' % block_id)
+                                                 name=f'normal_right4_{block_id}')(p)
+            x4 = keras.layers.add([x4_1, x4_2], name=f'normal_add_4_{block_id}')
 
         with keras.backend.name_scope('block_5'):
-            x5 = _separable_conv_block(h, filters, block_id='normal_left5_%s' % block_id)
-            x5 = keras.layers.add([x5, h], name='normal_add_5_%s' % block_id)
+            x5 = separable_conv_block(h, filters, block_id=f'normal_left5_{block_id}')
+            x5 = keras.layers.add([x5, h], name=f'normal_add_5_{block_id}')
 
-        x = keras.layers.concatenate([p, x1, x2, x3, x4, x5], axis=3, name='normal_concat_%s' % block_id)
+        x = keras.layers.concatenate([p, x1, x2, x3, x4, x5], axis=3, name=f'normal_concat_{block_id}')
     return x, ip
 
-
-
 def correct_pad(inputs, kernel_size):
-    """Returns a tuple for zero-padding for 2D convolution with downsampling.
-    # Arguments
-        kernel_size: An integer or tuple/list of 2 integers.
-    """
+    '''Returns a tuple for zero-padding for 2D convolution with downsampling.'''
     input_size = keras.backend.int_shape(inputs)[1:3]
-
     if isinstance(kernel_size, int):
         kernel_size = (kernel_size, kernel_size)
-
     if input_size[0] is None:
         adjust = (1, 1)
     else:
         adjust = (1 - input_size[0] % 2, 1 - input_size[1] % 2)
-
     correct = (kernel_size[0] // 2, kernel_size[1] // 2)
-
     return ((correct[0] - adjust[0], correct[0]),
             (correct[1] - adjust[1], correct[1]))

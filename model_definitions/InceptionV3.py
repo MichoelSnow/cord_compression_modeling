@@ -166,6 +166,8 @@ def InceptionV3(input_shape=None, pooling=None, classes=3):
             x = keras.layers.GlobalAveragePooling2D()(x)
         elif pooling == 'max':
             x = keras.layers.GlobalMaxPooling2D()(x)
+        else:
+            raise ValueError(f'Pooling must be set to None, avg, or max. Current value is {pooling}')
 
     # Create model.
     model = keras.models.Model(img_input, x, name='inception_v3')

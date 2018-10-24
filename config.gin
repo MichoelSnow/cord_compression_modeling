@@ -19,7 +19,7 @@ set_dir_flow_generator.seed=42
 set_dir_flow_generator.interpolation='nearest'
 
 call_fit_gen.steps_per_epoch=300
-call_fit_gen.epochs=50
+call_fit_gen.epochs=1
 call_fit_gen.validation_steps=100
 call_fit_gen.class_weight=None
 call_fit_gen.max_queue_size=50
