@@ -1,21 +1,11 @@
 import keras
 
-def conv2d_bn(x, filters, num_row, num_col, padding='same', strides=(1, 1), name=None):
-    '''Utility function to apply conv + BN.'''
-    bn_name = name + '_bn'
-    conv_name = name + '_conv'
-    x =  keras.layers.Conv2D(filters, (num_row, num_col), strides=strides, padding=padding, use_bias=False,
-                             name=conv_name)(x)
-    x =  keras.layers.BatchNormalization(axis=3, scale=False, name=bn_name)(x)
-    x =  keras.layers.Activation('relu', name=name)(x)
-    return x
-
 def InceptionV3(input_shape=None, pooling=None, classes=3):
     '''Instantiates the Inception v3 architecture.'''
     img_input = keras.layers.Input(shape=input_shape)
     x = conv2d_bn(img_input, 32, 3, 3, strides=(2, 2), padding='valid')
     x = conv2d_bn(x, 32, 3, 3, padding='valid')
-    x = conv2d_bn(x, 64, 3, 3)
+    x = conv2d_bn(x, 64, 3, 3, name='orig3')
     x = keras.layers.MaxPooling2D((3, 3), strides=(2, 2))(x)
     x = conv2d_bn(x, 80, 1, 1, padding='valid')
     x = conv2d_bn(x, 192, 3, 3, padding='valid')
@@ -151,7 +141,7 @@ def InceptionV3(input_shape=None, pooling=None, classes=3):
         branch3x3dbl = conv2d_bn(branch3x3dbl, 384, 3, 3)
         branch3x3dbl_1 = conv2d_bn(branch3x3dbl, 384, 1, 3)
         branch3x3dbl_2 = conv2d_bn(branch3x3dbl, 384, 3, 1)
-        branch3x3dbl =  keras.layers.concatenate([branch3x3dbl_1, branch3x3dbl_2], axis=channel_axis)
+        branch3x3dbl =  keras.layers.concatenate([branch3x3dbl_1, branch3x3dbl_2], axis=3)
 
         branch_pool =  keras.layers.AveragePooling2D((3, 3), strides=(1, 1), padding='same')(x)
         branch_pool = conv2d_bn(branch_pool, 192, 1, 1)
@@ -172,3 +162,13 @@ def InceptionV3(input_shape=None, pooling=None, classes=3):
     # Create model.
     model = keras.models.Model(img_input, x, name='inception_v3')
     return model
+
+def conv2d_bn(x, filters, num_row, num_col, padding='same', strides=(1, 1), name=None):
+    '''Utility function to apply conv + BN.'''
+    #bn_name = name + '_bn'
+    #conv_name = name + '_conv'
+    x =  keras.layers.Conv2D(filters, (num_row, num_col), strides=strides, padding=padding, use_bias=False)(x)
+    x =  keras.layers.BatchNormalization(axis=3, scale=False)(x)
+    x =  keras.layers.Activation('relu', name=name)(x)
+    return x
+

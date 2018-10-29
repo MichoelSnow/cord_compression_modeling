@@ -1,56 +1,5 @@
 import keras
 
-def conv2d_bn(x, filters, kernel_size, strides=1, padding='same', activation='relu', use_bias=False, name=None):
-    '''Utility function to apply conv + BN.'''
-    x = keras.layers.Conv2D(filters, kernel_size, strides=strides, padding=padding, use_bias=use_bias, name=name)(x)
-    if not use_bias:
-        bn_name = None if name is None else name + '_bn'
-        x = keras.layers.BatchNormalization(axis=3, scale=False, name=bn_name)(x)
-    if activation is not None:
-        ac_name = None if name is None else name + '_ac'
-        x = keras.layers.Activation(activation, name=ac_name)(x)
-    return x
-
-def inception_resnet_block(x, scale, block_type, block_idx, activation='relu'):
-    '''Adds a Inception-ResNet block.'''
-    if block_type == 'block35':
-        branch_0 = conv2d_bn(x, 32, 1)
-        branch_1 = conv2d_bn(x, 32, 1)
-        branch_1 = conv2d_bn(branch_1, 32, 3)
-        branch_2 = conv2d_bn(x, 32, 1)
-        branch_2 = conv2d_bn(branch_2, 48, 3)
-        branch_2 = conv2d_bn(branch_2, 64, 3)
-        branches = [branch_0, branch_1, branch_2]
-    elif block_type == 'block17':
-        branch_0 = conv2d_bn(x, 192, 1)
-        branch_1 = conv2d_bn(x, 128, 1)
-        branch_1 = conv2d_bn(branch_1, 160, [1, 7])
-        branch_1 = conv2d_bn(branch_1, 192, [7, 1])
-        branches = [branch_0, branch_1]
-    elif block_type == 'block8':
-        branch_0 = conv2d_bn(x, 192, 1)
-        branch_1 = conv2d_bn(x, 192, 1)
-        branch_1 = conv2d_bn(branch_1, 224, [1, 3])
-        branch_1 = conv2d_bn(branch_1, 256, [3, 1])
-        branches = [branch_0, branch_1]
-    else:
-        raise ValueError('Unknown Inception-ResNet block type. '
-                         'Expects "block35", "block17" or "block8", '
-                         'but got: ' + str(block_type))
-
-    block_name = block_type + '_' + str(block_idx)
-
-    mixed = keras.layers.Concatenate(axis=3, name=block_name + '_mixed')(branches)
-    up = conv2d_bn(mixed, keras.backend.int_shape(x)[3], 1, activation='relu', use_bias=True,
-                   name=block_name + '_conv')
-
-    x = keras.layers.Lambda(lambda inputs, scale: inputs[0] + inputs[1] * scale,
-                            output_shape=keras.backend.int_shape(x)[1:],
-                            arguments={'scale': scale}, name=block_name)([x, up])
-    if activation is not None:
-        x = keras.layers.Activation(activation, name=block_name + '_ac')(x)
-    return x
-
 def InceptionResNetV2(input_shape=None, pooling=None, classes=3):
     '''Instantiates the Inception-ResNet v2 architecture.'''
     img_input = keras.layers.Input(shape=input_shape)
@@ -129,3 +78,55 @@ def InceptionResNetV2(input_shape=None, pooling=None, classes=3):
     model = keras.models.Model(img_input, x, name='inception_resnet_v2')
 
     return model
+
+def conv2d_bn(x, filters, kernel_size, strides=1, padding='same', activation='relu', use_bias=False, name=None):
+    '''Utility function to apply conv + BN.'''
+    x = keras.layers.Conv2D(filters, kernel_size, strides=strides, padding=padding, use_bias=use_bias, name=name)(x)
+    if not use_bias:
+        bn_name = None if name is None else name + '_bn'
+        x = keras.layers.BatchNormalization(axis=3, scale=False, name=bn_name)(x)
+    if activation is not None:
+        ac_name = None if name is None else name + '_ac'
+        x = keras.layers.Activation(activation, name=ac_name)(x)
+    return x
+
+def inception_resnet_block(x, scale, block_type, block_idx, activation='relu'):
+    '''Adds a Inception-ResNet block.'''
+    if block_type == 'block35':
+        branch_0 = conv2d_bn(x, 32, 1)
+        branch_1 = conv2d_bn(x, 32, 1)
+        branch_1 = conv2d_bn(branch_1, 32, 3)
+        branch_2 = conv2d_bn(x, 32, 1)
+        branch_2 = conv2d_bn(branch_2, 48, 3)
+        branch_2 = conv2d_bn(branch_2, 64, 3)
+        branches = [branch_0, branch_1, branch_2]
+    elif block_type == 'block17':
+        branch_0 = conv2d_bn(x, 192, 1)
+        branch_1 = conv2d_bn(x, 128, 1)
+        branch_1 = conv2d_bn(branch_1, 160, [1, 7])
+        branch_1 = conv2d_bn(branch_1, 192, [7, 1])
+        branches = [branch_0, branch_1]
+    elif block_type == 'block8':
+        branch_0 = conv2d_bn(x, 192, 1)
+        branch_1 = conv2d_bn(x, 192, 1)
+        branch_1 = conv2d_bn(branch_1, 224, [1, 3])
+        branch_1 = conv2d_bn(branch_1, 256, [3, 1])
+        branches = [branch_0, branch_1]
+    else:
+        raise ValueError('Unknown Inception-ResNet block type. '
+                         'Expects "block35", "block17" or "block8", '
+                         'but got: ' + str(block_type))
+
+    block_name = block_type + '_' + str(block_idx)
+
+    mixed = keras.layers.Concatenate(axis=3, name=block_name + '_mixed')(branches)
+    up = conv2d_bn(mixed, keras.backend.int_shape(x)[3], 1, activation='relu', use_bias=True,
+                   name=block_name + '_conv')
+
+    x = keras.layers.Lambda(lambda inputs, scale: inputs[0] + inputs[1] * scale,
+                            output_shape=keras.backend.int_shape(x)[1:],
+                            arguments={'scale': scale}, name=block_name)([x, up])
+    if activation is not None:
+        x = keras.layers.Activation(activation, name=block_name + '_ac')(x)
+    return x
+

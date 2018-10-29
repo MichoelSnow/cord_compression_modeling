@@ -14,10 +14,12 @@ class ConfusionMatrix(Callback):
         self.validation_data = val_gen
         self.validation_labels = val_gen.classes
         self.batch_size = batch_size
+        self.val_batch = val_gen.batch_size
 
     def on_epoch_end(self, epoch, logs=None):
         print("Calculating confusion matrix")
-        predicted = self.model.predict_generator(self.validation_data, verbose=1)
+        num_val_gen_steps = len(self.validation_labels)/self.batch_size
+        predicted = self.model.predict_generator(self.validation_data, verbose=1, steps=num_val_gen_steps)
         predicted = np.argmax(predicted, axis=1)
         ground = self.validation_labels
         cm = sklearn.metrics.confusion_matrix(ground, predicted, labels=None, sample_weight=None)

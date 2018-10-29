@@ -1,8 +1,8 @@
 import keras
 
-def ResNet50(in_shape=None, pooling=None, classes=3):
+def ResNet50(input_shape=None, pooling=None, classes=3):
     """Instantiates the ResNet50 architecture."""
-    img_input = keras.layers.Input(shape=in_shape)
+    img_input = keras.layers.Input(shape=input_shape)
     x = keras.layers.ZeroPadding2D(padding=(3, 3), name='conv1_pad')(img_input)
     x = keras.layers.Conv2D(64, (7, 7), strides=(2, 2), padding='valid', kernel_initializer='he_normal',
                             name='conv1')(x)
