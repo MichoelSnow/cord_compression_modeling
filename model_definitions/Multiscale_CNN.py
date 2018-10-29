@@ -2,7 +2,7 @@ import keras
 from keras.backend import tf as ktf
 
 def Multiscale_CNN(input_shape=None, classes=3):
-    '''Instantiates the DenseNet architecture.'''
+    '''Instantiates the Multiscale CNN architecture.'''
     img_input = keras.layers.Input(shape=input_shape)
     # Scale 1  network
     scale_01_conv=conv2d(img_input, filters=[16,16,16], kernel_size=(5,5), strides=1, pad=2, activation='relu',
