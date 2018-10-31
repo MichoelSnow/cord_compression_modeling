@@ -7,20 +7,19 @@ from sklearn.model_selection import train_test_split
 
 @gin.configurable
 class FilePrep:
-    def __init__(self, project_dir=None, remake_dirs=False, train=0.60):
-        self.project_dir = project_dir
-        self.proj_image_dir = os.path.join(project_dir, 'images')
+    def __init__(self, image_path=None, remake_dirs=False, train=0.60):
+        self.proj_image_dir = os.path.join(image_path, 'images')
         self.remake_dirs = remake_dirs
         self.train = train
 
-    def _make_class_df(self, label_df_name='stage_1_detailed_class_info.csv', base_data_dir=None, file_type='png',
-                       file_name_col='patientId', image_paths_col='image_paths'):
-        labels_df_path = os.path.join(self.project_dir, label_df_name)
+    def _make_class_df(self, label_path=None, label_df_name=None, data_dir=None, file_type='png',
+                       file_name_col=None, image_paths_col=None):
+        labels_df_path = os.path.join(label_path, label_df_name)
         labels_df = pd.read_csv(labels_df_path)
         file_list = []
         file_names = []
         file_type = '.' + file_type
-        for root, _, files in os.walk(base_data_dir):
+        for root, _, files in os.walk(data_dir):
             for file in files:
                 if file.endswith(file_type):
                     file_names.append(file.replace(file_type, ''))
@@ -63,10 +62,11 @@ class FilePrep:
         return data_dict
 
     @gin.configurable
-    def build_dataset(self, label_df_name=None, file_type=None, file_name_col=None, label_col=None,
-                      image_paths_col=None, base_data_dir=None):
-        data_labels = self._make_class_df(label_df_name=label_df_name, file_type=file_type, file_name_col=file_name_col,
-                                          image_paths_col=image_paths_col,base_data_dir=base_data_dir)
+    def build_dataset(self, label_path=None, label_df_name=None, file_type=None, file_name_col=None, label_col=None,
+                      image_paths_col=None, data_dir=None):
+        data_labels = self._make_class_df(label_path=label_path, label_df_name=label_df_name, file_type=file_type,
+                                          file_name_col=file_name_col, image_paths_col=image_paths_col,
+                                          data_dir=data_dir)
         #data_labels.to_csv(os.path.join(self.proj_image_dir, 'names_labels'))
         train_base = os.path.join(self.proj_image_dir , 'train')
         test_base  = os.path.join(self.proj_image_dir , 'test')
