@@ -36,7 +36,7 @@ def set_keras_callbacks(calls=None, batch_size=None, gen=None, checkpoint_name='
 
 @gin.configurable
 def call_fit_gen(model=None, gen=None, steps_per_epoch=None, epochs=100, validation_data=None, validation_steps=None,
-                 class_weight=None, max_queue_size=10, workers=1, use_multiprocessing=False):
+                 class_weight=None, max_queue_size=50, workers=1, use_multiprocessing=False):
     callbacks = set_keras_callbacks(gen=validation_data)
     history = model.fit_generator(generator=gen,
                                   steps_per_epoch=steps_per_epoch,
