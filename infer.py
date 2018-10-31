@@ -2,6 +2,7 @@ import keras
 import os
 import gin
 
+
 # Images functions
 @gin.configurable
 def load_images(image_dir_path=None):
@@ -14,9 +15,9 @@ def preprocessing():
 
 # Model functions
 @gin.configurable
-def load_model(model_name=None, model_path=None):
+def load_model(model_name=None, model_path=None, custom_objects=None):
     load_path = os.path.join(model_path, model_name)
-    model = keras.models.load_model(load_path)
+    model = keras.models.load_model(load_path, custom_objects=custom_objects)
     return model
 
 @gin.configurable

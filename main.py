@@ -25,9 +25,9 @@ def run():
 
     # Add a model
     #cnn_model = simple_sep_CNN(in_shape=in_shape, output=out_shape)
-    cnn_model = simple_CNN(in_shape=in_shape, output=out_shape)
+    #cnn_model = simple_CNN(in_shape=in_shape, output=out_shape)
     #cnn_model = Multiscale_CNN(input_shape=in_shape, classes=out_shape)
-    #cnn_model = ResNet50(input_shape=in_shape, classes=out_shape)
+    cnn_model = ResNet50(input_shape=in_shape, classes=out_shape)
     #cnn_model = DenseNet121(input_shape=in_shape)
     #cnn_model = DenseNet169(input_shape=in_shape)
     #cnn_model = DenseNet201(input_shape=in_shape)
@@ -50,7 +50,7 @@ def run():
                            gen=train_gen,
                            validation_data=test_gen)
 
-    save_model(model=cnn_model, model_name='test1.h5')
+    save_model(model=cnn_model, model_name='ResNet50.h5')
 
     print(history.history)
 

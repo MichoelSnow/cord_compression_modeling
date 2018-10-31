@@ -6,3 +6,5 @@ gin-config>=0.1.1.2
 SimpleITK>=1.1.0
 opencv-python>=3.4
 pydicom>=1.2
+keras-vis>=0.4.1
+shap>=0.24.0

@@ -1,7 +1,9 @@
+# Add the intial data to the fikle prep object.
 FilePrep.image_path='/data/gferguso/cord_comp/'
 FilePrep.remake_dirs=False
 FilePrep.train=0.60
 
+# Set the variables for reading data and building file system.
 build_dataset.data_dir='/data/gferguso/cord_comp/Debug_data_subset'
 build_dataset.label_path='/data/gferguso/cord_comp/'
 build_dataset.label_df_name='stage_1_detailed_class_info.csv'
@@ -10,9 +12,11 @@ build_dataset.file_name_col='patientId'
 build_dataset.label_col='class'
 build_dataset.image_paths_col='image_paths'
 
+# Set the input shape for the images
 set_input_output.input_shape=(128, 128, 1)
 set_input_output.output_shape=(3)
 
+# Set variables for the generators
 set_dir_flow_generator.batch_size=50
 set_dir_flow_generator.color_mode='grayscale'
 set_dir_flow_generator.class_mode='categorical'
@@ -20,19 +24,11 @@ set_dir_flow_generator.shuffle=True
 set_dir_flow_generator.seed=42
 set_dir_flow_generator.interpolation='nearest'
 
+# Set the  in variables
 call_fit_gen.steps_per_epoch=24
 call_fit_gen.epochs=1
 call_fit_gen.validation_steps=12
 call_fit_gen.class_weight=None
-call_fit_gen.max_queue_size=50
-call_fit_gen.workers=1
-call_fit_gen.use_multiprocessing=False
-
 set_adam.lr=0.001
-
-#save_model.model=None
-#save_model.model_name='test.h5'
-
-set_keras_callbacks.calls=None
 set_keras_callbacks.batch_size=50
 
