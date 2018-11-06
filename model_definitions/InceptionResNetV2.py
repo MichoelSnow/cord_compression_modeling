@@ -72,7 +72,7 @@ def InceptionResNetV2(input_shape=None, pooling=None, classes=3):
         elif pooling == 'max':
             x = keras.layers.GlobalMaxPooling2D()(x)
         else:
-            raise ValueError(f'Pooling must be None, avg, or max. Current value: {pooling}')
+            raise ValueError('Pooling must be None, avg, or max. Current value: {}'.format(pooling))
 
     # Create model.
     model = keras.models.Model(img_input, x, name='inception_resnet_v2')

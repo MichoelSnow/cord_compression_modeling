@@ -30,7 +30,7 @@ def DenseNet(blocks, input_shape=None, pooling=None, classes=3):
         elif pooling == 'max':
             mod_output = keras.layers.GlobalMaxPooling2D()(x)
         else:
-            raise ValueError(f'Pooling must be set to None, avg, or max. Current value: {pooling}')
+            raise ValueError('Pooling must be set to None, avg, or max. Current value: {}'.format(pooling))
 
     # Create model.
     if blocks == [6, 12, 24, 16]:

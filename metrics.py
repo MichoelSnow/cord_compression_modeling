@@ -37,7 +37,6 @@ class ConfusionMatrix(Callback):
         print(template.format("", "Total predicted", np.sum(
             cm[:, 0]), np.sum(cm[:, 1]), np.sum(cm[:, 2]), ""))
 
-@gin.configurable
 def F1_score(y_true, y_pred, smooth=1.0):
     intersection = tf.reduce_sum(y_true * y_pred)
     union = tf.reduce_sum(y_true + y_pred)
@@ -46,23 +45,19 @@ def F1_score(y_true, y_pred, smooth=1.0):
     F1 = numerator / denominator
     return tf.reduce_mean(F1)
 
-@gin.configurable
 def sensitivity(y_true, y_pred, smooth=1.):
     intersection = tf.reduce_sum(y_true * y_pred)
     coef = (intersection + smooth) / (tf.reduce_sum(y_true) + smooth)
     return coef
 
-@gin.configurable
 def specificity(y_true, y_pred, smooth=1.):
     intersection = tf.reduce_sum(y_true * y_pred)
     coef = (intersection + smooth) / (tf.reduce_sum(y_pred) + smooth)
     return coef
 
-@gin.configurable
 def muilticlass_logloss(y_true, y_pred):
     return tf.losses.log_loss(y_true, y_pred)
 
-@gin.configurable
 def dice_coef_loss(y_true, y_pred, smooth=1.):
     y_true_f = K.flatten(y_true)
     y_pred_f = K.flatten(y_pred)
