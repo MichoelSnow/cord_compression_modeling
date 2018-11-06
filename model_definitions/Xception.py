@@ -114,7 +114,7 @@ def Xception(input_shape=None, pooling=None,classes=3):
         elif pooling == 'max':
             x = keras.layers.GlobalMaxPooling2D()(x)
         else:
-            raise ValueError(f'Pooling must be None, avg, or max. Current value is {pooling}')
+            raise ValueError('Pooling must be None, avg, or max. Current value is {}'.format(pooling))
 
     # Create model.
     model = keras.models.Model(img_input, x, name='xception')

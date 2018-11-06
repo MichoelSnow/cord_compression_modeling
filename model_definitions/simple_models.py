@@ -4,7 +4,7 @@ import gin
 @gin.configurable
 def simple_CNN(in_shape=(None, None, 1), output=3):
     ''' A simple CNN for testing'''
-    print(f'in_shape: {in_shape}')
+    #print('in_shape: {in_shape}')
     input     = keras.layers.Input(shape=(in_shape[0], in_shape[1], in_shape[2]), name='scnn_input')
     conv1     = keras.layers.Conv2D(filters=64, kernel_size=(5, 5), activation='relu',use_bias=True,
                                     kernel_initializer='he_uniform')(input)
