@@ -32,8 +32,10 @@ COPY --chown=cordcomp:cordcomp ./model_definitions/*.py /home/cordcomp/cord_comp
 COPY --chown=cordcomp:cordcomp config.gin /home/cordcomp/cord_comp/
 COPY --chown=cordcomp:cordcomp requirements.txt /home/cordcomp/cord_comp/
 
+ENV PATH=$PATH:/home/cordcomp/.local/bin
 RUN pip install opencv-python tqdm matplotlib scipy seaborn --user
 RUN pip install /home/cordcomp/cord_comp/. --user
-ENV PATH=$PATH:/home/cordcomp/.local/bin
+# This must be installed using git as the authors didn't update the tarball or pyPI.
+RUN pip install git+https://github.com/raghakot/keras-vis.git
 ENTRYPOINT ["bash"]
 
