@@ -31,8 +31,8 @@ def set_gen(featurewise_center=False, samplewise_center=False, featurewise_std_n
     return datagen
 
 @gin.configurable
-def set_dir_flow_generator(dir='.', image_size=(128,128), batch_size=32, color_mode='greyscale',
-                           class_mode='categorical', shuffle=True, seed=42, interpolation='nearest'):
+def set_dir_flow_generator(dir='.', image_size=None, batch_size=32, color_mode='greyscale',
+                           class_mode='categorical', shuffle=False, seed=42, interpolation='nearest'):
     gen = set_gen()
     name = gen.flow_from_directory(directory=dir,target_size=image_size, batch_size=batch_size,
                                    color_mode=color_mode, class_mode=class_mode,shuffle=shuffle, seed=seed,

@@ -18,7 +18,8 @@ class ConfusionMatrix(Callback):
 
     def on_epoch_end(self, epoch, logs=None):
         print("Calculating confusion matrix")
-        num_val_gen_steps = len(self.validation_labels)/self.batch_size
+        num_val_gen_steps = (len(self.validation_labels)//self.batch_size) + 1
+        print('num_val_gen_steps = {}'.format(num_val_gen_steps))
         predicted = self.model.predict_generator(self.validation_data, verbose=1, steps=num_val_gen_steps)
         predicted = np.argmax(predicted, axis=1)
         ground = self.validation_labels

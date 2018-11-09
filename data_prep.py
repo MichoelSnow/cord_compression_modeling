@@ -67,6 +67,8 @@ class FilePrep:
         data_labels = self._make_class_df(label_path=label_path, label_df_name=label_df_name, file_type=file_type,
                                           file_name_col=file_name_col, image_paths_col=image_paths_col,
                                           data_dir=data_dir)
+        if data_labels.empty:
+            raise ValueError('The data directory {} is empty.'.format(data_dir))
         #data_labels.to_csv(os.path.join(self.proj_image_dir, 'names_labels'))
         train_base = os.path.join(self.proj_image_dir , 'train')
         test_base  = os.path.join(self.proj_image_dir , 'test')

@@ -1,6 +1,7 @@
 import gin
 import keras
 from metrics import ConfusionMatrix
+from keras_contrib.utils.save_load_utils import save_all_weights, load_all_wieghts
 
 @gin.configurable
 def set_keras_callbacks(calls=None, batch_size=None, gen=None, checkpoint_name='test.h5'):
@@ -14,8 +15,9 @@ def set_keras_callbacks(calls=None, batch_size=None, gen=None, checkpoint_name='
     earlystopping_callback = keras.callbacks.EarlyStopping(monitor="val_loss", patience=3, verbose=1)
     rop_callback = keras.callbacks.ReduceLROnPlateau(monitor='val_loss', factor=0.1, patience=5, verbose=0,
                                                      mode='auto', min_delta=0.0001, cooldown=0, min_lr=0)
+    #save_weights_callback =  keras.callbacks.LambdaCallback()
     confusion_callback = ConfusionMatrix(val_gen=gen, batch_size=batch_size)
-    base_calls = [tb_callback, checkpoint_callback, earlystopping_callback, rop_callback,confusion_callback]
+    base_calls = [tb_callback,checkpoint_callback, earlystopping_callback, rop_callback,confusion_callback]
     fin_calls = base_calls + added_calls
     return fin_calls
 
@@ -53,4 +55,3 @@ def call_fit_gen(model=None, gen=None, steps_per_epoch=None, epochs=100, validat
 @gin.configurable
 def save_model(model=None, model_name='test.h5'):
     model.save(model_name)
-
