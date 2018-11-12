@@ -3,6 +3,7 @@ import keras
 def NASNet(input_shape=None, penultimate_filters=4032, num_blocks=6, stem_block_filters=96, skip_reduction=True,
            filter_multiplier=2, pooling=None, classes=3):
     '''Instantiates a NASNet model.'''
+    raise NotImplemented('NASNet is awaiting a bug fix for the Intel MKL library.')
     img_input = keras.layers.Input(shape=input_shape)
     if penultimate_filters % (24 * (filter_multiplier ** 2)) != 0:
         raise ValueError('For NASNet-A models, the `penultimate_filters` must be a multiple of '

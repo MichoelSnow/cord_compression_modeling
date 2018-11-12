@@ -56,7 +56,6 @@ def ActMaxList(model=None, layer_name=None, filter_index=None, backprop_modifier
 def feature_maps_vis(model, backprop_modifier=None, grad_modifier=None, lp_norm_weight=0., tv_weight=0., verbose=False,
                      layer_name=None, columns=8, model_name=None, custom_objects=None, **opt_kwargs):
     # The name of the layer we want to visualize
-    layer_name = layer_name
     layer_idx = vis.utils.utils.find_layer_idx(model, layer_name)
 
     # Visualize all filters in this layer.

@@ -129,15 +129,8 @@ def run():
 
     ####### NASNet
     print('Fitting NasNet')
-
     cnn_model = NASNet(input_shape=in_shape)
     comp_model(model=cnn_model)
-    cnn_model.summary()
-    history = call_fit_gen(model=cnn_model,
-                           gen=train_gen,
-                           validation_data=test_gen)
-    save_model(model=cnn_model, model_name='NASNet.h5')
-    print(history.history)
 
 if __name__ == '__main__':
     run()

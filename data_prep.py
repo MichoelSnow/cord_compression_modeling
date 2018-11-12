@@ -55,7 +55,7 @@ class FilePrep:
                                                                                      test_size=1-self.train,
                                                                                      random_state=42)
         img_test, img_val, label_test, label_val = train_test_split(img_test_val, label_test_val,
-                                                                    train_size=0.5, test_size=1 - self.train,
+                                                                    train_size=0.5,
                                                                     random_state=42)
         data_dict = {'img_train':img_train,'label_train':label_train,'img_test':img_test,'label_test':label_test,
                      'img_val':img_val,'label_val':label_val}
