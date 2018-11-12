@@ -13,7 +13,7 @@ build_dataset.label_col='class'
 build_dataset.image_paths_col='image_paths'
 
 # Set the input shape for the images
-set_input_output.input_shape=(128, 128, 1)
+set_input_output.input_shape=(512,512, 1)
 set_input_output.output_shape=(3)
 
 # Set variables for the generators
@@ -25,9 +25,7 @@ set_dir_flow_generator.seed=42
 set_dir_flow_generator.interpolation='nearest'
 
 # Set the  in variables
-call_fit_gen.steps_per_epoch=24
 call_fit_gen.epochs=1
-call_fit_gen.validation_steps=12
 call_fit_gen.class_weight=None
 set_adam.lr=0.001
 set_keras_callbacks.batch_size=50

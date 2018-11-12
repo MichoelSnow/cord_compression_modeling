@@ -6,7 +6,7 @@ import sklearn
 import gin
 
 class ConfusionMatrix(Callback):
-    def __init__(self, val_gen=None, batch_size=None):
+    def __init__(self, val_gen, batch_size):
         # !!!! A bug in keras keeps self.validation (in the Callback class) from ever being set with a generator,
         # used classes from the validation generator instead
         super().__init__()
