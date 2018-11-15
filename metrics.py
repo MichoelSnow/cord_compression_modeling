@@ -23,6 +23,8 @@ class ConfusionMatrix(Callback):
         predicted = self.model.predict_generator(self.validation_data, verbose=1, steps=num_val_gen_steps)
         predicted = np.argmax(predicted, axis=1)
         ground = self.validation_labels
+        print(len(predicted))
+        print(len(ground))
         cm = sklearn.metrics.confusion_matrix(ground, predicted, labels=None, sample_weight=None)
         template = "{0:10}|{1:30}|{2:10}|{3:30}|{4:15}|{5:15}"
         print(template.format("", "", "", "Predicted", "", ""))

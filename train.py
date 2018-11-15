@@ -1,7 +1,6 @@
 import gin
 import keras
 from metrics import ConfusionMatrix
-#from keras_contrib.utils.save_load_utils import save_all_weights, load_all_wieghts
 
 @gin.configurable
 def set_keras_callbacks(calls=None, batch_size=None, gen=None, checkpoint_name='test.h5'):
@@ -41,8 +40,8 @@ def call_fit_gen(model=None, gen=None, epochs=100, validation_data=None,
                  class_weight=None, max_queue_size=50, workers=1, use_multiprocessing=False):
     epoch_steps = (len(gen.classes)//gen.batch_size) + 1
     val_steps = (len(validation_data.classes)//validation_data.batch_size) + 1
-    print(epoch_steps)
-    print(val_steps)
+    #print(epoch_steps)
+    #print(val_steps)
     callbacks = set_keras_callbacks(gen=validation_data)
     history = model.fit_generator(generator=gen,
                                   steps_per_epoch=epoch_steps,

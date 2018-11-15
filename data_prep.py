@@ -76,7 +76,7 @@ class FilePrep:
         label_names = self.unique_label_names(data_labels[label_col])
         data_dict = self._train_test_val(data_labels, image_paths_col=image_paths_col, label_col=label_col)
         for i, label in enumerate(label_names):
-            s_label = label.strip().replace('/', 'and').replace(' ', '_')
+            s_label = str(label).strip().replace('/', 'and').replace(' ', '_')
             dir_name = 'class_{0:03d}_{1}'.format(i, s_label)
             train_path = os.path.join(train_base, dir_name)
             test_path  = os.path.join(test_base, dir_name)
