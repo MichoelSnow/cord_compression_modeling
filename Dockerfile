@@ -17,10 +17,12 @@ RUN apt-get update && apt-get install -y --allow-downgrades --no-install-recomme
      rm -rf /var/lib/apt/lists/*
 
 
-RUN useradd -ms /bin/bash cordcomp
+RUN useradd cordcomp 
 RUN usermod -aG sudo cordcomp
 WORKDIR /opt
 RUN chown cordcomp /opt
+RUN chown cordcomp /
+RUN chgrp cordcomp /
 WORKDIR /home/cordcomp/cord_comp
 RUN chown cordcomp /home
 RUN chown cordcomp /home/cordcomp
@@ -38,5 +40,6 @@ RUN pip install /home/cordcomp/cord_comp/. --user
 # This must be installed using git as the authors didn't update the tarball or pyPI.
 RUN pip install git+https://github.com/raghakot/keras-vis.git --user
 RUN pip install git+https://www.github.com/keras-team/keras-contrib.git --user
+>>>>>>> Stashed changes
 ENTRYPOINT ["bash"]
 

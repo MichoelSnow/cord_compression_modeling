@@ -11,10 +11,12 @@ def set_adam(lr=0.0001, beta_1=0.9, beta_2=0.999, epsilon=None, decay=0.0, amsgr
 @gin.configurable
 def set_loss():
     return 'categorical_crossentropy'
+    #return 'sparse_categorical_crossentropy'
 
 @gin.configurable
 def set_metrics():
-    return [F1_score, sensitivity, specificity, muilticlass_logloss]
+    #return [F1_score, sensitivity, specificity, muilticlass_logloss]
+    return ['acc', muilticlass_logloss]
 
 @gin.configurable
 def comp_model(model=None, **kwargs):

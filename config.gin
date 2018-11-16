@@ -22,7 +22,7 @@ set_input_output.output_shape=(3)
 set_dir_flow_generator.batch_size=128
 set_dir_flow_generator.color_mode='grayscale'
 set_dir_flow_generator.class_mode='categorical'
-set_dir_flow_generator.shuffle=True
+#set_dir_flow_generator.shuffle=True
 set_dir_flow_generator.seed=42
 set_dir_flow_generator.interpolation='nearest'
 

@@ -10,6 +10,8 @@ from PIL import Image
 
 class ConfusionMatrix(Callback):
     def __init__(self, val_gen):
+        # !!!! A bug in keras keeps self.validation (in the Callback class) from ever being set with a generator,
+        # used classes from the validation generator instead
         super().__init__()
         val_gen.reset()
         self.validation_data = val_gen
@@ -19,12 +21,47 @@ class ConfusionMatrix(Callback):
 
     def on_epoch_end(self, epoch, logs=None):
         print("Calculating confusion matrix")
+        #print(vars(vars(self.validation_data)['image_data_generator']))
         num_val_gen_steps = math.ceil(len(self.validation_labels)/self.val_batch)
-        predicted = self.model.predict_generator(self.validation_data, verbose=1, steps=num_val_gen_steps, )
-        predicted = np.argmax(predicted, axis=1)
+        #black_field_001.png  black_field_023.png  black_field_034.png  black_field_044.png  black_field_050.png
+        #black_field_007.png  black_field_025.png  black_field_042.png  black_field_047.png  black_field_071.png
+        #
+        #checkerboard_060.png  checkerboard_073.png  checkerboard_078.png  checkerboard_081.png  checkerboard_089.png
+        #checkerboard_063.png  checkerboard_075.png  checkerboard_079.png  checkerboard_085.png  checkerboard_092.png
+        #
+        #white_field_014.png  white_field_032.png  white_field_055.png  white_field_067.png  white_field_074.png
+        #white_field_023.png  white_field_037.png  white_field_066.png  white_field_070.png  white_field_500.png
+        #
+        #im = Image.open('/data/glferguso/cv_unit_test/images/test/class_002_2/white_field_037.png')
+        #im = np.array(im.resize((128,128))) 
+        #im = np.reshape(im, (1, 128, 128, 1))
+        predicted_1 = self.model.predict_generator(self.validation_data, verbose=1, steps=num_val_gen_steps, )
+        datagen = keras.preprocessing.image.ImageDataGenerator(rescale=1./255) 
+        generator = datagen.flow_from_directory(
+                '/data/glferguso/cv_unit_test/images/test',
+                target_size=(128, 128),
+                batch_size=10,
+                color_mode='grayscale',
+                class_mode='categorical',  # only data, no labels
+                seed=42,
+                interpolation='nearest',
+                shuffle=False)  # keep data in same order as labels
+                                      
+        probabilities = self.model.predict_generator(generator, 3) 
+
+        #print(vars(self.validation_data))
+        #print('\n')
+        #print(vars(generator))
+
+        predicted = np.argmax(probabilities, axis=1)
+        predicted_1 = np.argmax(predicted_1, axis=1)
         ground = self.validation_labels
-        cm = sklearn.metrics.confusion_matrix(ground, predicted, labels=None, sample_weight=None)
-        print(cm)
+#        #print('predicted = {}'.format(predicted))
+        print(predicted)
+        print(predicted_1)
+        print(ground)
+#        cm = sklearn.metrics.confusion_matrix(ground, predicted, labels=None, sample_weight=None)
+        #print(cm)
 #        template = "{0:10}|{1:30}|{2:10}|{3:30}|{4:15}|{5:15}"
 #        print(template.format("", "", "", "Predicted", "", ""))
 #        print(template.format("", "", "Normal", "No Lung Opacity / Not Normal", "Lung Opacity", "Total true"))

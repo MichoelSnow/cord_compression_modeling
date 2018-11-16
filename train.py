@@ -3,7 +3,7 @@ import keras
 from metrics import ConfusionMatrix
 
 @gin.configurable
-def set_keras_callbacks(calls=None, batch_size=None, gen=None, checkpoint_name='test.h5'):
+def set_keras_callbacks(calls=None, gen=None, checkpoint_name='test.h5'):
     if not calls:
         added_calls = []
     else:
@@ -15,8 +15,9 @@ def set_keras_callbacks(calls=None, batch_size=None, gen=None, checkpoint_name='
     rop_callback = keras.callbacks.ReduceLROnPlateau(monitor='val_loss', factor=0.1, patience=5, verbose=0,
                                                      mode='auto', min_delta=0.0001, cooldown=0, min_lr=0)
     #save_weights_callback =  keras.callbacks.LambdaCallback()
-    confusion_callback = ConfusionMatrix(val_gen=gen, batch_size=batch_size)
-    base_calls = [tb_callback,checkpoint_callback, earlystopping_callback, rop_callback,confusion_callback]
+    confusion_callback = ConfusionMatrix(val_gen=gen)
+    base_calls = [tb_callback, checkpoint_callback, earlystopping_callback, rop_callback,confusion_callback]
+    #base_calls = [tb_callback, checkpoint_callback, earlystopping_callback, rop_callback]
     fin_calls = base_calls + added_calls
     return fin_calls
 
@@ -37,7 +38,7 @@ def set_keras_callbacks(calls=None, batch_size=None, gen=None, checkpoint_name='
 
 @gin.configurable
 def call_fit_gen(model=None, gen=None, epochs=100, validation_data=None,
-                 class_weight=None, max_queue_size=50, workers=1, use_multiprocessing=False):
+                 class_weight=None, workers=1, use_multiprocessing=False):
     epoch_steps = (len(gen.classes)//gen.batch_size) + 1
     val_steps = (len(validation_data.classes)//validation_data.batch_size) + 1
     #print(epoch_steps)
@@ -50,9 +51,9 @@ def call_fit_gen(model=None, gen=None, epochs=100, validation_data=None,
                                   validation_data=validation_data,
                                   validation_steps=val_steps,
                                   class_weight=class_weight,
-                                  max_queue_size=max_queue_size,
                                   workers=workers,
                                   use_multiprocessing=use_multiprocessing)
+
     return history
 
 @gin.configurable
