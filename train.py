@@ -1,6 +1,6 @@
 import gin
 import keras
-from metrics import ConfusionMatrix
+from metrics import Summary_metrics
 
 @gin.configurable
 def set_keras_callbacks(calls=None, gen=None, checkpoint_name='test.h5'):
@@ -14,35 +14,16 @@ def set_keras_callbacks(calls=None, gen=None, checkpoint_name='test.h5'):
     earlystopping_callback = keras.callbacks.EarlyStopping(monitor="val_loss", patience=3, verbose=1)
     rop_callback = keras.callbacks.ReduceLROnPlateau(monitor='val_loss', factor=0.1, patience=5, verbose=0,
                                                      mode='auto', min_delta=0.0001, cooldown=0, min_lr=0)
-    #save_weights_callback =  keras.callbacks.LambdaCallback()
-    confusion_callback = ConfusionMatrix(val_gen=gen)
-    base_calls = [tb_callback, checkpoint_callback, earlystopping_callback, rop_callback,confusion_callback]
-    #base_calls = [tb_callback, checkpoint_callback, earlystopping_callback, rop_callback]
+    Summary_metrics_callback = Summary_metrics(val_gen=gen)
+    base_calls = [tb_callback, checkpoint_callback, earlystopping_callback, rop_callback, Summary_metrics_callback]
     fin_calls = base_calls + added_calls
     return fin_calls
-
-# # https://www.tensorflow.org/api_docs/python/tf/keras/callbacks/ModelCheckpoint
-# checkpointer = tf.keras.callbacks.ModelCheckpoint(filepath=CHECKPOINT_FILENAME,
-#         monitor="val_loss",
-#         verbose=1,
-#         save_best_only=True)
-#
-# # https://www.tensorflow.org/api_docs/python/tf/keras/callbacks/TensorBoard
-# #TODO custom tensorboard log file names..... or write to unqiue dir as a sub dir in the logs file...
-# tensorboard = tf.keras.callbacks.TensorBoard(log_dir=TB_LOG_DIR,
-#         # histogram_freq=1, #this screwed us over... caused tensorboard callback to fail.. why??? DEBUG !!!!!!
-#         # batch_size=BATCH_SIZE, # and take this out... and boom.. histogam frequency works. sob
-#         write_graph=True,
-#         write_grads=False,
-#         write_images=True)
 
 @gin.configurable
 def call_fit_gen(model=None, gen=None, epochs=100, validation_data=None,
                  class_weight=None, workers=1, use_multiprocessing=False):
     epoch_steps = (len(gen.classes)//gen.batch_size) + 1
     val_steps = (len(validation_data.classes)//validation_data.batch_size) + 1
-    #print(epoch_steps)
-    #print(val_steps)
     callbacks = set_keras_callbacks(gen=validation_data)
     history = model.fit_generator(generator=gen,
                                   steps_per_epoch=epoch_steps,

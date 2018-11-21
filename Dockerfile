@@ -40,6 +40,5 @@ RUN pip install /home/cordcomp/cord_comp/. --user
 # This must be installed using git as the authors didn't update the tarball or pyPI.
 RUN pip install git+https://github.com/raghakot/keras-vis.git --user
 RUN pip install git+https://www.github.com/keras-team/keras-contrib.git --user
->>>>>>> Stashed changes
 ENTRYPOINT ["bash"]
 

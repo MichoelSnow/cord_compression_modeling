@@ -1,5 +1,5 @@
 import keras
-from metrics import F1_score, sensitivity, specificity, muilticlass_logloss
+from metrics import muilticlass_logloss
 import gin
 
 
@@ -15,7 +15,6 @@ def set_loss():
 
 @gin.configurable
 def set_metrics():
-    #return [F1_score, sensitivity, specificity, muilticlass_logloss]
     return ['acc', muilticlass_logloss]
 
 @gin.configurable
