@@ -1,4 +1,5 @@
 include config.gin
 include config_UNIT_TEST.gin
 include config_vis.gin
+include config_Docker.gin
 include Dockerfile

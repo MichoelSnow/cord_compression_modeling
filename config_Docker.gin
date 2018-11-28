@@ -1,0 +1,32 @@
+
+FilePrep.image_path='/home/cordcomp/cord_data/'
+FilePrep.remake_dirs=False
+FilePrep.train=0.70
+
+# Set the variables for reading data and building file system.
+build_dataset.data_dir='/home/cordcomp/cord_data/DATA'
+build_dataset.label_path='/home/cordcomp/cord_data/'
+build_dataset.label_df_name='stage_1_detailed_class_info.csv'
+#build_dataset.label_df_name='color_check_files.csv'
+build_dataset.file_type='png'
+build_dataset.file_name_col='patientId'
+#build_dataset.file_name_col='file_name'
+build_dataset.label_col='class'
+build_dataset.image_paths_col='image_paths'
+
+# Set the input shape for the images
+set_input_output.input_shape=(256, 256, 1)
+set_input_output.output_shape=(3)
+
+# Set variables for the generators
+set_dir_flow_generator.batch_size=128
+set_dir_flow_generator.color_mode='grayscale'
+set_dir_flow_generator.class_mode='categorical'
+#set_dir_flow_generator.shuffle=True
+set_dir_flow_generator.seed=42
+set_dir_flow_generator.interpolation='nearest'
+
+# Set the  in variables
+call_fit_gen.epochs=1
+call_fit_gen.class_weight=None
+set_adam.lr=0.001
