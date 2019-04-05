@@ -6,11 +6,11 @@ with open('requirements.txt') as req_file:
 print(required)
 
 setup(
-    name='cord_comp',
+    name='cv_prototyping_framework',
     version='0.0.0.0.0.0.0.3',
-    description="A computer vision framework to model cord compression",
+    description="A computer vision framework for rapidly prototyping models",
     author="Glen Ferguson and Michoel Snow",
-    author_email='msnow1@montefiore.org',
+    author_email='glen@ferguson76.com',
     packages=find_packages(),
     install_requires=required,
     classifiers=[

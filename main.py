@@ -1,19 +1,16 @@
-import pandas as pd
 import gin
-import keras
-from data_prep import FilePrep
-from model_definitions.model_utils import set_input_output
-from model_comp import comp_model
-from generators import set_dir_flow_generator
-from train import save_model, call_fit_gen
-from model_definitions.simple_models import simple_sep_CNN, simple_CNN
-from model_definitions.ResNet50 import (ResNet50)
-from model_definitions.InceptionResNetV2 import InceptionResNetV2
-from model_definitions.InceptionV3 import InceptionV3
-from model_definitions.Multiscale_CNN import Multiscale_CNN
-from model_definitions.NASNnet import NASNet
-from model_definitions.Xception import Xception
-from model_definitions.DenseNet import DenseNet121,DenseNet169, DenseNet201, DenseNetCustom
+from cv_framework.data_access.data_prep import FilePrep
+from cv_framework.model_definitions.model_utils import set_input_output
+from cv_framework.training.model_comp import comp_model
+from cv_framework.data_access.generators import set_dir_flow_generator
+from cv_framework.training.train import save_model, call_fit_gen
+from cv_framework.model_definitions.simple_models import simple_CNN
+from cv_framework.model_definitions.ResNet50 import (ResNet50)
+from cv_framework.model_definitions.InceptionResNetV2 import InceptionResNetV2
+from cv_framework.model_definitions.InceptionV3 import InceptionV3
+from cv_framework.model_definitions.Multiscale_CNN import Multiscale_CNN
+from cv_framework.model_definitions.Xception import Xception
+from cv_framework.model_definitions.DenseNet import DenseNet121,DenseNet169, DenseNet201
 
 
 def run():

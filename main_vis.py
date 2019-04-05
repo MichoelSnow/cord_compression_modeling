@@ -1,8 +1,8 @@
 import gin
-from infer import load_model
-from vis_tools import ActMax, ActMaxList, feature_maps_vis, saliency, CAM, shap_maps
-from model_definitions.model_utils import set_input_output
-from metrics import F1_score, sensitivity, specificity, muilticlass_logloss
+from cv_framework.inference.infer import load_model
+from cv_framework.visualization.vis_tools import shap_maps
+from cv_framework.model_definitions.model_utils import set_input_output
+from cv_framework.metrics.metrics import F1_score, sensitivity, specificity, muilticlass_logloss
 
 
 def run():

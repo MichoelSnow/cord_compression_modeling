@@ -2,7 +2,7 @@ import keras
 from vis.utils import utils
 import vis.input_modifiers
 import vis.visualization
-from shap_save import shap_image_plot
+from cv_framework.visualization.shap_save import shap_image_plot
 import gin
 import numpy as np
 import matplotlib.pylab as plt
@@ -15,13 +15,23 @@ def ActMax(model=None, layer_name=None, filter_index=None, backprop_modifier=Non
 
     layer_idx = vis.utils.utils.find_layer_idx(model, layer_name)
     model.layers[layer_idx].activation = keras.activations.linear
-    model = vis.utils.utils.apply_modifications(model, custom_objects=custom_objects)
-    img = vis.visualization.visualize_activation(model, layer_idx, filter_indices=filter_index,
-                                                 backprop_modifier=backprop_modifier, grad_modifier=grad_modifier,
-                                                 lp_norm_weight=lp_norm_weight, tv_weight=tv_weight, verbose=verbose,
-                                                 **opt_kwargs)
+    model = vis.utils.utils.apply_modifications(
+        model,
+        custom_objects=custom_objects)
+    img = vis.visualization.visualize_activation(
+        model, layer_idx,
+        filter_indices=filter_index,
+        backprop_modifier=backprop_modifier,
+        grad_modifier=grad_modifier,
+        lp_norm_weight=lp_norm_weight,
+        tv_weight=tv_weight,
+        verbose=verbose,
+        **opt_kwargs)
+
     plt.imshow(img[..., 0], cmap='jet')
+
     fig_name = '/data/gferguso/cord_comp/visual/ActMax_' + str(filter_index) + '_' + str(layer_name) + '_' + model_name + '.png'
+
     plt.savefig(fig_name, format='png')
 
 def ActMaxList(model=None, layer_name=None, filter_index=None, backprop_modifier=None, grad_modifier=None,

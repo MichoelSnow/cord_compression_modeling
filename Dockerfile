@@ -30,7 +30,7 @@ RUN chown cordcomp /home/cordcomp/cord_comp
 USER cordcomp
 
 COPY --chown=cordcomp:cordcomp *.py /home/cordcomp/cord_comp/
-COPY --chown=cordcomp:cordcomp ./model_definitions/*.py /home/cordcomp/cord_comp/model_definitions/
+COPY --chown=cordcomp:cordcomp cv_framework/model_definitions /home/cordcomp/cord_comp/model_definitions/
 COPY --chown=cordcomp:cordcomp config.gin /home/cordcomp/cord_comp/
 COPY --chown=cordcomp:cordcomp requirements.txt /home/cordcomp/cord_comp/
 

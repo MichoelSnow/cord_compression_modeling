@@ -2,7 +2,6 @@ import keras
 import os
 import gin
 
-
 # Images functions
 @gin.configurable
 def load_images(image_dir_path=None):
