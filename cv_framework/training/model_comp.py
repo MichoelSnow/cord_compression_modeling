@@ -73,7 +73,7 @@ def set_opt_params(optimizer, params):
 
 @gin.configurable
 def set_optimizer(optimizer, lr=None, momentum=None, decay=None, nestrov=None, rho=None, epsilon=None,
-                   beta_1=None, beta_2=None, amsgrad=None, schedule_decay=None):
+                  beta_1=None, beta_2=None, amsgrad=None, schedule_decay=None):
     allowed_optimizers = [
         'SGD',
         'RMSprop',
