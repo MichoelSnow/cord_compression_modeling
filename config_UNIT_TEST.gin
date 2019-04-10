@@ -1,20 +1,22 @@
-# Add the intial data to the fikle prep object.
-FilePrep.image_path='/data/gferguso/cv_unit_test/'
-FilePrep.remake_dirs=False
-FilePrep.train=0.60
+# Add the initial data to the file prep object.
+CompVisExperiment.base_directory='/data/gferguso/cv_unit_test/'
+CompVisExperiment.experiment_name='WB_Unit_Test_symlink'
+CompVisExperiment.image_directory='/data/gferguso/cv_unit_test/cv_unit_test_image_dir'
+CompVisExperiment.labels_csv='color_field_files.csv'
+CompVisExperiment.file_name_column='file_name'
+CompVisExperiment.labels_column='class'
+CompVisExperiment.use_symlinks=True
 
 # Set the variables for reading data and building file system.
-build_dataset.data_dir='/data/gferguso/cv_unit_test/DATA'
-build_dataset.label_path='/data/gferguso/cv_unit_test/'
-build_dataset.label_df_name='color_check_files.csv'
-build_dataset.file_type='png'
-build_dataset.file_name_col='file_name'
-build_dataset.label_col='class'
-build_dataset.image_paths_col='image_paths'
+FilePrep.remake_train_test=False
+FilePrep.train=0.60
 
 # Set the input shape for the images
 set_input_output.input_shape=(128, 128, 1)
-set_input_output.output_shape=(3)
+set_input_output.output_shape=(2)
+
+# Set variables for building models
+
 
 # Set variables for the generators
 set_dir_flow_generator.batch_size=10
@@ -23,7 +25,8 @@ set_dir_flow_generator.class_mode='categorical'
 set_dir_flow_generator.seed=42
 set_dir_flow_generator.interpolation='nearest'
 
-# Set the  in variables
-call_fit_gen.epochs=1
+# Set the in variables
+call_fit_gen.epochs=3
 call_fit_gen.class_weight=None
-set_adam.lr=0.001
+optimizer.optimizer='Adam'
+optimizer.lr=0.001

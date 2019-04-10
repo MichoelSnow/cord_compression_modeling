@@ -2,7 +2,7 @@ import keras
 from vis.utils import utils
 import vis.input_modifiers
 import vis.visualization
-from cv_framework.visualization.shap_save import shap_image_plot
+from cv_framework.diagnostics.shap_save import shap_image_plot
 import gin
 import numpy as np
 import matplotlib.pylab as plt

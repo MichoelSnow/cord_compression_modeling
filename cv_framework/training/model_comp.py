@@ -62,17 +62,19 @@ def set_opt_params(optimizer, params):
         ]
     }
 
-    for k,v in params.items():
-        if  all([True if x == None else False for x in v]):
-            return params_default_dict[optimizer]
-        else:
-            for val in params:
-                if params[val] not in allowed_opt_params[k]:
-                    del params[val]
+    values = params.values()
+    if  all([True if x == None else False for x in values]):
+        return params_default_dict[optimizer]
+    else:
+        for key in list(params.keys()):
+            if key not in allowed_opt_params[optimizer]:
+                params.pop(key)
+            elif not params[key]:
+                params[key] = params_default_dict[optimizer][key]
     return params
 
 @gin.configurable
-def set_optimizer(optimizer, lr=None, momentum=None, decay=None, nestrov=None, rho=None, epsilon=None,
+def optimizer(optimizer, lr=None, momentum=None, decay=None, nestrov=None, rho=None, epsilon=None,
                   beta_1=None, beta_2=None, amsgrad=None, schedule_decay=None):
     allowed_optimizers = [
         'SGD',
@@ -98,24 +100,24 @@ def set_optimizer(optimizer, lr=None, momentum=None, decay=None, nestrov=None, r
     }
 
     if optimizer not in allowed_optimizers:
-        raise ValueError(f'Optimzer {optimizer} must be in the allowed list: {allowed_optimizers}')
+        raise ValueError(f'Optimizer {optimizer} not in the allowed list: {allowed_optimizers}')
 
     fin_params = set_opt_params(optimizer, params)
 
     optimizers = {
-        'SGD':keras.optimizers.SGD(**fin_params),
-        'RMSprop':keras.optimizers.RMSprop(**fin_params),
-        'Adagrad':keras.optimizers.Adagrad(**fin_params),
-        'Adadelta':keras.optimizers.Adadelta(**fin_params),
-        'Adam':keras.optimizers.Adam(**fin_params),
-        'Adamax':keras.optimizers.adamax(**fin_params),
-        'Nadam':keras.optimizers.Nadam(**fin_params),
+        'SGD':keras.optimizers.SGD,
+        'RMSprop':keras.optimizers.RMSprop,
+        'Adagrad':keras.optimizers.Adagrad,
+        'Adadelta':keras.optimizers.Adadelta,
+        'Adam':keras.optimizers.Adam,
+        'Adamax':keras.optimizers.adamax,
+        'Nadam':keras.optimizers.Nadam,
         }
 
-    return optimizers[optimizer]
+    return optimizers[optimizer](** fin_params)
 
 @gin.configurable
-def set_loss(loss='categorical_crossentropy'):
+def loss_function(loss='categorical_crossentropy'):
     allowed_losses = ['mean_squared_error',
                       'mean_absolute_error',
                       'mean_absolute_percentage_error',
@@ -137,7 +139,7 @@ def set_loss(loss='categorical_crossentropy'):
         return loss
 
 @gin.configurable
-def set_batch_metrics(metrics=None):
+def batch_metrics(metrics=None):
     batch_metrics = ['acc']
     if not metrics:
         return batch_metrics
@@ -146,9 +148,9 @@ def set_batch_metrics(metrics=None):
     else:
         raise ValueError('Batch metircs must be a list.')
 
-@gin.configurable
 def comp_model(model=None, **kwargs):
-    k_opt = set_adam(**kwargs)
-    k_loss = set_loss()
-    k_metrics = set_batch_metrics(metrics=[muilticlass_logloss])
-    model.compile(optimizer=k_opt, loss=k_loss, metrics=k_metrics)
+    opt = optimizer(**kwargs)
+    loss = loss_function()
+    metrics = batch_metrics(metrics=[muilticlass_logloss])
+    model.compile(optimizer=opt, loss=loss, metrics=metrics)
+    return model
