@@ -94,7 +94,29 @@ def binary_metrics(ground, pred, class_names=None, history=None, save_figs=False
     FNR = FN / (TP + FN + small_value_to_avoid_div_by_zero)
     return sens, spec, roc_auc, class_rep, TP, TN, FP, FN, PPV, NPV, FPR, FNR
 
-
+# def multi_metrics(ground, pred, class_names=None, history=None, save_figs=False, model_name=None):
+#     predicted_class = np.argmax(pred, axis=1)
+#     class_rep = classification_report(ground, predicted_class)
+#     cnf_matrix = confusion_matrix(ground, predicted_class)
+#     plot_confusion_matrix(cnf_matrix, classes=class_names, normalize=False, title='Confusion matrix',
+#                           save_figs=save_figs, model_name=model_name)
+#     acc_vs_Epochs(history, save_figs=save_figs, model_name=model_name)
+#     loss_vs_Epochs(history, save_figs=save_figs, model_name=model_name)
+#     sens = recall_score(ground, predicted_class, pos_label=1)
+#     spec = recall_score(ground, predicted_class, pos_label=0)
+#     roc_auc = roc_auc_score(ground, pred[:,1])
+#     small_value_to_avoid_div_by_zero = 0.0000001
+#     FP = cnf_matrix[0][1]
+#     FN = cnf_matrix[1][0]
+#     TP = cnf_matrix[0][0]
+#     TN = cnf_matrix[1][1]
+#     PPV = TP / (TP + FP + small_value_to_avoid_div_by_zero)
+#     NPV = TN / (TN + FN + small_value_to_avoid_div_by_zero)
+#     FPR = FP / (FP + TN + small_value_to_avoid_div_by_zero)
+#     FNR = FN / (TP + FN + small_value_to_avoid_div_by_zero)
+#
+#     return precision_dict, recall_dict, f1_dict, TP_dict, TN_dict, FP_dict, FN_dict, PPV_dict, NPV_dict, FPR_dict,\
+#            FNR_dict, class_rep
 
 
 

@@ -1,4 +1,7 @@
-# Add the initial data to the file prep object.
+###################### Global Experiment Parameters ######################
+# Each experiment should have its own configuration file. These variables are always be preceded by CompVisExperiment.
+
+# Parameters
 CompVisExperiment.base_directory='/data/gferguso/cv_unit_test/'
 CompVisExperiment.experiment_name='WB_Unit_Test_symlink'
 CompVisExperiment.image_directory='/data/gferguso/cv_unit_test/cv_unit_test_image_dir'
@@ -7,26 +10,82 @@ CompVisExperiment.file_name_column='file_name'
 CompVisExperiment.labels_column='class'
 CompVisExperiment.use_symlinks=True
 
-# Set the variables for reading data and building file system.
+###################### Global Dataset Parameters ######################
+# In the cases this where these need to change, e.g., learning curves,
+# each set of data should be a new experiment.
+
+# Dataset Parameters
 FilePrep.remake_train_test=False
 FilePrep.train=0.60
 
-# Set the input shape for the images
-set_input_output.input_shape=(128, 128, 1)
-set_input_output.output_shape=(2)
+###################### Model-Specific Dataset Parameters ######################
+# Variable names MUST match those in sent in the model dictionary, e.g, the model_dict
+# {'simple_CNN':['sim_dog', 'sim_cat'], 'ResNet50':['res_dog', 'res_cat']} sets two instances of the
+# Simple CNN architecture to the names sim_dog and sim_cat and two instances of ResNet50 architecture to the names
+# res_dog and res_cat. Variables can then be set as follows: sim_cat/ = value sets the learning rate for the
+# simple_CNN architecture with the name sim_cat. Variables without a name are set for ALL models. If a global
+# default is not set then sertting must be applied to each model.
 
-# Set variables for building models
+# Data Shape Parameters
+data_shape.input=(128, 128, 1)
+sim_cat/data_shape.input=(32, 32, 1)
+res_cat/data_shape.input=(64, 64, 1)
+data_shape.output=(2)
 
+# Overall Generator Parameters
+directory_flow.dir='.'
+directory_flow.batch_size=10
+directory_flow.color_mode='grayscale'
+directory_flow.class_mode='categorical'
+directory_flow.seed=42
+directory_flow.interpolation='nearest'
 
-# Set variables for the generators
-set_dir_flow_generator.batch_size=10
-set_dir_flow_generator.color_mode='grayscale'
-set_dir_flow_generator.class_mode='categorical'
-set_dir_flow_generator.seed=42
-set_dir_flow_generator.interpolation='nearest'
+# Batch Generator Parameters
+fit_generator.epochs=3
+fit_generator.class_weight=None
+fit_generator.featurewise_center=False
+fit_generator.samplewise_center=False
+fit_generator.featurewise_std_normalization=False
+fit_generator.samplewise_std_normalization=False
+fit_generator.zca_whitening=False
+fit_generator.zca_epsilon=1e-06
+fit_generator.rotation_range=0
+fit_generator.width_shift_range=0.0
+fit_generator.height_shift_range=0.0
+fit_generator.brightness_range=None
+fit_generator.shear_range=0.0
+fit_generator.zoom_range=0.0
+fit_generator.channel_shift_range=0.0
+fit_generator.fill_mode='nearest'
+fit_generator.cval=0.0
+fit_generator.horizontal_flip=False
+fit_generator.vertical_flip=False
+fit_generator.rescale=1./255
+fit_generator.preprocessing_function=None
 
-# Set the in variables
-call_fit_gen.epochs=3
-call_fit_gen.class_weight=None
-optimizer.optimizer='Adam'
-optimizer.lr=0.001
+###################### Model Specific Parameters ######################
+# Variables set for each model
+
+# Model Parameters
+# NOTE: Incoreect optimizer parameters will be ignored, e.g., setting the rho parameter
+# for the Adam optimizer will have no effect
+sim_cat/comp_model.lr=10.0
+sim_dog/comp_model.lr=0.001
+res_cat/comp_model.lr=100.0
+res_dog/comp_model.lr=0.0000001
+comp_model.optimizer='Adam'
+comp_model.loss='categorical_crossentropy'
+#comp_model.metrics=None
+#comp_model.momentum=None
+#comp_model.decay=None
+#comp_model.nestrov=None
+#comp_model.rho=None
+#comp_model.epsilon=None
+#comp_model.beta_1=None
+#comp_model.beta_2=None
+#comp_model.amsgrad=None
+#comp_model.schedule_decay=None
+
+# Add callbacks
+callback_list.calls=None
+

@@ -2,20 +2,27 @@ import gin
 import math
 import os
 import pandas as pd
-import numpy as np
+from tqdm import tqdm
 from cv_framework.data_access.data_prep import FilePrep
-from cv_framework.model_definitions.model_utils import set_input_output
+from cv_framework.model_definitions.model_utils import data_shape
 from cv_framework.training.model_comp import comp_model
-from cv_framework.data_access.generators import set_dir_flow_generator
-from cv_framework.training.train import save_model, call_fit_gen
-from cv_framework.model_definitions import model_dict
+from cv_framework.data_access.generators import directory_flow
+from cv_framework.training.train import save_model, fit_generator
 from cv_framework.diagnostics import basic_diagnostics
+from cv_framework.model_definitions import standard_arch_dict
 
 @gin.configurable
 class CompVisExperiment:
 
-    def __init__(self, base_directory=None, image_directory=None, experiment_name=None, labels_csv=None,
-                 file_name_column='file_name', labels_column='class',  use_symlinks=False):
+    def __init__(self,
+                 base_directory=None,
+                 image_directory=None,
+                 experiment_name=None,
+                 labels_csv=None,
+                 file_name_column='file_name',
+                 labels_column='class',
+                 use_symlinks=False):
+
         exp_dir = os.path.join(base_directory, str(experiment_name))
         if not os.path.exists(exp_dir):
             try:
@@ -23,70 +30,101 @@ class CompVisExperiment:
             except Exception as e:
                 print(f'Could not make experimental directory: {e}')
 
-
         print("Building Train/Test/Validation data directories.")
         if not image_directory:
             image_directory = os.path.join(exp_dir, 'images')
 
         labels_csv_path = os.path.join(base_directory, labels_csv)
-        file_prep = FilePrep(exp_directory=exp_dir, image_directory=image_directory, labels_csv_path=labels_csv_path, file_name_column=file_name_column,
-                             labels_column=labels_column, use_symlinks=use_symlinks)
+        file_prep = FilePrep(
+            exp_directory=exp_dir,
+            image_directory=image_directory,
+            labels_csv_path=labels_csv_path,
+            file_name_column=file_name_column,
+            labels_column=labels_column,
+            use_symlinks=use_symlinks)
         file_prep.create_modeling_dataset()
 
         self.unique_class_labels = file_prep.label_names
+        self.train_dir = os.path.join(exp_dir + '/train')
+        self.test_dir  = os.path.join(exp_dir + '/test')
 
-        train_dir = os.path.join(exp_dir + '/train')
-        test_dir  = os.path.join(exp_dir + '/test')
 
-        self.image_size, self.in_shape, self.out_shape = set_input_output()
-        self.train_gen = set_dir_flow_generator(dir=train_dir, shuffle=True, image_size=self.image_size)
-        self.test_gen = set_dir_flow_generator(dir=test_dir, shuffle=False, image_size=self.image_size)
+    def standard_models(self):
+        print(list(standard_arch_dict.standard_dict.keys()))
 
-    def available_models(self):
-        print(list(model_dict.models_dict.keys()))
+    def _build_model_dict(self, model_dict):
+        model_dictionary = {}
+        for arch_name, model_list in model_dict.items():
+            for model in model_list:
+                model_dictionary[model] = standard_arch_dict.standard_dict[arch_name]
+        return model_dictionary
 
     @gin.configurable
-    def build_models(self, model_list, summary=True):
+    def build_models(self, model_dict, summary=True):
+        model_dictionary = self._build_model_dict(model_dict)
         compiled_models = {}
-        for model in model_list:
-            cnn_model = model_dict.models_dict[model](input_shape=self.in_shape, classes=self.out_shape)
-            if summary:
-                cnn_model.summary()
-            compiled_models[model] = comp_model(model=cnn_model)
+        for model_name, model_arch in model_dictionary.items():
+            with gin.config_scope(model_name):
+                _, in_shape, out_shape = data_shape()
+                cnn_model = comp_model(
+                    model_name=model_name,
+                    model_arch=model_arch,
+                    input_shape=in_shape,
+                    classes=out_shape)
+                compiled_models[model_name] = cnn_model
+                if summary:
+                    compiled_models[model_name].summary()
         return compiled_models
 
     @gin.configurable
     def train_models(self, train_list, compiled_models, model_type='bin_classifier', save_figs=False,
                      print_class_rep=True):
-        history_dict = {}
         score_dict = {}
-        for model in train_list:
-            save_name = str(model) + ('.h5')
-            history = call_fit_gen(
-                model=compiled_models[model],
-                gen=self.train_gen,
-                validation_data=self.test_gen)
-            save_model(model=compiled_models[model], model_name=save_name)
-            history_dict[model] = history.history
-            self.test_gen.reset()
-            preds = compiled_models[model].predict_generator(
-                self.test_gen,  verbose=1, steps=math.ceil(len(self.test_gen.classes)/self.test_gen.batch_size)
-            )
-            score_dict[model] = self.score_models(preds, model, history=history_dict[model], save_figs=save_figs,
-                                                  model_type=model_type, print_class_rep=print_class_rep)
+        for model_name in tqdm(train_list):
+            history_dict = {}
+            with gin.config_scope(model_name):
+                image_size, _, _ = data_shape()
+                #print(f'\nModel name: {model_name} \nImage Size: {image_size}')
+                train_gen = directory_flow(dir=self.train_dir, shuffle=True, image_size=image_size)
+                test_gen = directory_flow(dir=self.test_dir, shuffle=False, image_size=image_size)
+                save_name = str(model_name) + ('.h5')
+                history = fit_generator(
+                    model_name=model_name,
+                    model=compiled_models[model_name],
+                    gen=train_gen,
+                    validation_data=test_gen)
+                save_model(model=compiled_models[model_name], model_name=save_name)
+                history_dict[model_name] = history.history
+                test_gen.reset()
+                preds = compiled_models[model_name].predict_generator(
+                    test_gen,
+                    verbose=1,
+                    steps=math.ceil(len(test_gen.classes)/test_gen.batch_size)
+                )
+                score_dict[model_name] = self.score_models(
+                    preds, model_name,
+                    history=history_dict[model_name],
+                    save_figs=save_figs,
+                    model_type=model_type,
+                    print_class_rep=print_class_rep,
+                    test_gen=test_gen)
 
         model_table = pd.DataFrame(score_dict).transpose().reset_index().rename(mapper={'index':'Model_Name'}, axis=1)
         return compiled_models, model_table
 
-    def score_models(self, preds, model, history=None, save_figs=False, model_type=None, print_class_rep=None):
+    @gin.configurable
+    def score_models(self, preds, model, history=None, save_figs=False, model_type=None, print_class_rep=None,
+                     test_gen=None):
         if model_type == 'bin_classifier':
-            return self.score_binary_classifiers(preds, model, history, save_figs, print_class_rep)
+            return self._score_binary_classifiers(preds, model, history, save_figs, print_class_rep, test_gen)
+        elif model_type == 'multiclass':
+            return self._score_multi_classifiers(preds, model, history, save_figs, print_class_rep, test_gen)
 
     @gin.configurable
-    def score_binary_classifiers(self, preds, model, history, save_figs, print_class_rep):
+    def _score_binary_classifiers(self, preds, model, history, save_figs, print_class_rep, test_gen):
         model = str(model)
         sens, spec, roc_auc, class_rep, TP, TN, FP, FN, PPV, NPV, FPR, FNR = basic_diagnostics.binary_metrics(
-            self.test_gen.classes, preds, history=history, save_figs=save_figs, class_names=self.unique_class_labels,
+            test_gen.classes, preds, history=history, save_figs=save_figs, class_names=self.unique_class_labels,
             model_name=model
         )
         model_scores = {'Sensitivity':sens, 'Specificity':spec, 'ROC_AUC_SCORE':roc_auc, 'True_Positives':TP,
@@ -99,6 +137,24 @@ class CompVisExperiment:
 
         return model_scores
 
+    @gin.configurable
+    def _score_multi_classifiers(self, preds, model, history, save_figs, print_class_rep):
+        pass
+        # model = str(model)
+        # precision_dict, recall_dict, f1_dict, TP_dict, TN_dict, FP_dict, FN_dict, PPV_dict, NPV_dict, FPR_dict, \
+        # FNR_dict, class_rep = basic_diagnostics.multi_metrics(
+        #     self.test_gen.classes, preds, history=history, save_figs=save_figs, class_names=self.unique_class_labels,
+        #     model_name=model
+        # )
+        # model_scores = {'Precision':precision_dict, 'Recall':recall_dict, 'True_Positives':TP_dict,
+        #                 'True_Negatives':TN_dict, 'False_Positives':FP_dict, 'False_Negatives':FN_dict,
+        #                 'Positive_Predictive_Value':PPV_dict, 'Negative_Predictive_Value':NPV_dict,
+        #                 'False_Positive_Rate':FPR_dict, 'False_Negative_Rate':FNR_dict}
+        #
+        # if print_class_rep:
+        #     print(class_rep)
+        #
+        # return model_scores
 
 
 

@@ -1,9 +1,10 @@
 import keras
-from cv_framework.metrics.metrics import muilticlass_logloss
 import gin
+from cv_framework.metrics.metrics import muilticlass_logloss
+from cv_framework.model_definitions import standard_arch_dict
 
 @gin.configurable
-def set_opt_params(optimizer, params):
+def opt_params(optimizer, params):
     params_default_dict = {
         'SGD':{'lr':0.01, 'momentum':0.0, 'decay':0.0, 'nesterov':False},
         'RMSprop':{'lr':0.001, 'rho':0.9, 'epsilon':None, 'decay':0.0},
@@ -74,7 +75,7 @@ def set_opt_params(optimizer, params):
     return params
 
 @gin.configurable
-def optimizer(optimizer, lr=None, momentum=None, decay=None, nestrov=None, rho=None, epsilon=None,
+def set_optimizer(optimizer, lr=None, momentum=None, decay=None, nestrov=None, rho=None, epsilon=None,
                   beta_1=None, beta_2=None, amsgrad=None, schedule_decay=None):
     allowed_optimizers = [
         'SGD',
@@ -102,7 +103,7 @@ def optimizer(optimizer, lr=None, momentum=None, decay=None, nestrov=None, rho=N
     if optimizer not in allowed_optimizers:
         raise ValueError(f'Optimizer {optimizer} not in the allowed list: {allowed_optimizers}')
 
-    fin_params = set_opt_params(optimizer, params)
+    fin_params = opt_params(optimizer, params)
 
     optimizers = {
         'SGD':keras.optimizers.SGD,
@@ -117,22 +118,26 @@ def optimizer(optimizer, lr=None, momentum=None, decay=None, nestrov=None, rho=N
     return optimizers[optimizer](** fin_params)
 
 @gin.configurable
-def loss_function(loss='categorical_crossentropy'):
-    allowed_losses = ['mean_squared_error',
-                      'mean_absolute_error',
-                      'mean_absolute_percentage_error',
-                      'mean_squared_logarithmic_error',
-                      'squared_hinge',
-                      'hinge',
-                      'categorical_hinge',
-                      'logcosh',
-                      'categorical_crossentropy',
-                      'sparse_categorical_crossentropy',
-                      'binary_crossentropy',
-                      'kullback_leibler_divergence',
-                      'poisson',
-                      'cosine_proximity',
-                      ]
+def loss_function(loss=None):
+    allowed_losses = [
+        'mean_squared_error',
+        'mean_absolute_error',
+        'mean_absolute_percentage_error',
+        'mean_squared_logarithmic_error',
+        'squared_hinge',
+        'hinge',
+        'categorical_hinge',
+        'logcosh',
+        'categorical_crossentropy',
+        'sparse_categorical_crossentropy',
+        'binary_crossentropy',
+        'kullback_leibler_divergence',
+        'poisson',
+        'cosine_proximity'
+    ]
+    if not loss:
+        raise Exception('Loss value must be set!')
+
     if loss not in allowed_losses:
         raise ValueError(f'Losses {loss} is not in allowed losses: {allowed_losses}')
     else:
@@ -140,17 +145,23 @@ def loss_function(loss='categorical_crossentropy'):
 
 @gin.configurable
 def batch_metrics(metrics=None):
-    batch_metrics = ['acc']
+    batch_metrics = ['acc', muilticlass_logloss]
     if not metrics:
         return batch_metrics
     elif isinstance(metrics, list):
         return batch_metrics + metrics
     else:
-        raise ValueError('Batch metircs must be a list.')
+        raise ValueError('Batch metrics must be a list.')
 
-def comp_model(model=None, **kwargs):
-    opt = optimizer(**kwargs)
-    loss = loss_function()
-    metrics = batch_metrics(metrics=[muilticlass_logloss])
-    model.compile(optimizer=opt, loss=loss, metrics=metrics)
-    return model
+@gin.configurable
+def comp_model(model_name=None, model_arch=None, loss=None, metrics=None, input_shape=None, classes=None, lr=None,
+               momentum=None, decay=None, nestrov=None, rho=None, epsilon=None, beta_1=None, beta_2=None, amsgrad=None,
+               schedule_decay=None, optimizer=None):
+    print(f'model name: {model_name}')
+    cnn_model = model_arch(input_shape=input_shape, classes=classes)
+    opt = set_optimizer(optimizer=optimizer, lr=lr, momentum=momentum, decay=decay, nestrov=nestrov, rho=rho, epsilon=epsilon,
+                    beta_1=beta_1, beta_2=beta_2, amsgrad=amsgrad, schedule_decay=schedule_decay)
+    loss = loss_function(loss=loss)
+    metrics = batch_metrics(metrics=metrics)
+    cnn_model.compile(optimizer=opt, loss=loss, metrics=metrics)
+    return cnn_model

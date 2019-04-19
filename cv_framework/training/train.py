@@ -3,14 +3,16 @@ import keras
 from cv_framework.metrics.metrics import Summary_metrics
 
 @gin.configurable
-def set_keras_callbacks(calls=None, gen=None, checkpoint_name='test.h5'):
+def callback_list(calls=None, gen=None, checkpoint_name='test.h5'):
     if not calls:
         added_calls = []
     else:
         added_calls = calls
 
+    check_name = checkpoint_name + '_checkpoint' + '.h5'
+
     checkpoint_callback = keras.callbacks.ModelCheckpoint(
-        checkpoint_name,
+        check_name,
         monitor="val_loss",
         verbose=1,
         save_best_only=True,
@@ -35,14 +37,11 @@ def set_keras_callbacks(calls=None, gen=None, checkpoint_name='test.h5'):
     return fin_calls
 
 @gin.configurable
-def call_fit_gen(model=None, gen=None, epochs=100, validation_data=None, class_weight=None, workers=1,
+def fit_generator(model_name=None,model=None, gen=None, epochs=100, validation_data=None, class_weight=None, workers=1,
                  use_multiprocessing=False):
     epoch_steps = (len(gen.classes)//gen.batch_size) + 1
-
     val_steps = (len(validation_data.classes)//validation_data.batch_size) + 1
-
-    callbacks = set_keras_callbacks(gen=validation_data)
-
+    callbacks = callback_list(gen=validation_data, checkpoint_name=model_name)
     history = model.fit_generator(
         generator=gen,
         steps_per_epoch=epoch_steps,

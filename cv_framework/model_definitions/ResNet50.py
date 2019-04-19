@@ -1,5 +1,7 @@
 import keras
+import gin
 
+@gin.configurable
 def ResNet50(input_shape=None, pooling=None, classes=3):
     """Instantiates the ResNet50 architecture."""
     img_input = keras.layers.Input(shape=input_shape)

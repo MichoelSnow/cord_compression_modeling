@@ -6,8 +6,8 @@ from .Multiscale_CNN import Multiscale_CNN
 from .Xception import Xception
 from .DenseNet import DenseNet121,DenseNet169, DenseNet201
 
-models_dict = {
-    'simple_cnn':simple_CNN,
+standard_dict = {
+    'simple_CNN':simple_CNN,
     'ResNet50':ResNet50,
     'InceptionResNetV2':InceptionResNetV2,
     'InceptionV3':InceptionV3,
