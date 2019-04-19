@@ -1,14 +1,22 @@
 import gin
-from cv_framework import control_flow
+from cv_framework import cv_scientist
 import keras.backend as K
 
 def run():
     # run gin-config
     gin.parse_config_file('config_UNIT_TEST.gin')
     # setup experiment
-    experiment = control_flow.CompVisExperiment()
+    experiment = cv_scientist.CompVisExperiment()
 
-    model_dict = {'simple_CNN':['sim_dog', 'sim_cat'], 'ResNet50':['res_dog', 'res_cat']}
+    model_dict = {'simple_CNN':['sim_dog', 'sim_cat'],
+                  'ResNet50':['res_dog', 'res_cat'],
+                  'InceptionResNetV2':['InResV2'],
+                  'InceptionV3':['IncV2'],
+                  'Multiscale_CNN':['Multi'],
+                  'Xception':['Xcep'],
+                  'DenseNet121':['DN121'],
+                  'DenseNet169':['DN169'],
+                  'DenseNet201':['DN201']}
     compiled_models = experiment.build_models(model_dict)
     train_list = list(compiled_models.keys())
     trained_models, model_table = experiment.train_models(train_list, compiled_models, save_figs=False,

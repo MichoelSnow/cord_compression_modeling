@@ -43,25 +43,27 @@ directory_flow.interpolation='nearest'
 # Batch Generator Parameters
 fit_generator.epochs=3
 fit_generator.class_weight=None
-fit_generator.featurewise_center=False
-fit_generator.samplewise_center=False
-fit_generator.featurewise_std_normalization=False
-fit_generator.samplewise_std_normalization=False
-fit_generator.zca_whitening=False
-fit_generator.zca_epsilon=1e-06
-fit_generator.rotation_range=0
-fit_generator.width_shift_range=0.0
-fit_generator.height_shift_range=0.0
-fit_generator.brightness_range=None
-fit_generator.shear_range=0.0
-fit_generator.zoom_range=0.0
-fit_generator.channel_shift_range=0.0
-fit_generator.fill_mode='nearest'
-fit_generator.cval=0.0
-fit_generator.horizontal_flip=False
-fit_generator.vertical_flip=False
-fit_generator.rescale=1./255
-fit_generator.preprocessing_function=None
+
+# Image Generator Parameters
+image_generator.featurewise_center=False
+image_generator.samplewise_center=False
+image_generator.featurewise_std_normalization=False
+image_generator.samplewise_std_normalization=False
+image_generator.zca_whitening=False
+image_generator.zca_epsilon=1e-06
+image_generator.rotation_range=0
+image_generator.width_shift_range=0.0
+image_generator.height_shift_range=0.0
+image_generator.brightness_range=None
+image_generator.shear_range=0.0
+image_generator.zoom_range=0.0
+image_generator.channel_shift_range=0.0
+image_generator.fill_mode='nearest'
+image_generator.cval=0.0
+image_generator.horizontal_flip=False
+image_generator.vertical_flip=False
+#image_generator.rescale=1.0/255
+image_generator.preprocessing_function=None
 
 ###################### Model Specific Parameters ######################
 # Variables set for each model
@@ -69,10 +71,10 @@ fit_generator.preprocessing_function=None
 # Model Parameters
 # NOTE: Incoreect optimizer parameters will be ignored, e.g., setting the rho parameter
 # for the Adam optimizer will have no effect
-sim_cat/comp_model.lr=10.0
-sim_dog/comp_model.lr=0.001
-res_cat/comp_model.lr=100.0
-res_dog/comp_model.lr=0.0000001
+sim_cat/comp_model.lr=0.01
+sim_dog/comp_model.lr=0.0001
+res_cat/comp_model.lr=0.01
+res_dog/comp_model.lr=0.0001
 comp_model.optimizer='Adam'
 comp_model.loss='categorical_crossentropy'
 #comp_model.metrics=None

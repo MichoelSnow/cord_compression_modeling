@@ -43,22 +43,22 @@ def DenseNet(blocks, input_shape=None, pooling=None, classes=3):
         model = keras.models.Model(img_input, mod_output, name='densenet')
     return model
 
-def DenseNet121(input_shape=None):
-    return DenseNet([6, 12, 24, 16], input_shape=input_shape)
+def DenseNet121(input_shape=None, classes=3):
+    return DenseNet([6, 12, 24, 16], input_shape=input_shape, classes=classes)
 
-def DenseNet169(input_shape=None):
-    return DenseNet([6, 12, 32, 32], input_shape=input_shape)
+def DenseNet169(input_shape=None, classes=3):
+    return DenseNet([6, 12, 32, 32], input_shape=input_shape, classes=classes)
 
-def DenseNet201(input_shape=None):
-    return DenseNet([6, 12, 48, 32], input_shape=input_shape)
+def DenseNet201(input_shape=None,classes=3):
+    return DenseNet([6, 12, 48, 32], input_shape=input_shape, classes=classes)
 
-def DenseNetCustom(blocks, input_shape=None):
+def DenseNetCustom(blocks, input_shape=None, classes=3):
     if not isinstance(blocks, list):
         raise ValueError('Blocks must be a list')
     elif len(blocks) != 4 or all(type(x) is int for x in blocks):
         raise ValueError('Blocks must be a list of four integers!')
     else:
-        return DenseNet(blocks, input_shape=input_shape)
+        return DenseNet(blocks, input_shape=input_shape, classes=classes)
 
 def dense_block(x, blocks, name):
     '''A dense block.'''
