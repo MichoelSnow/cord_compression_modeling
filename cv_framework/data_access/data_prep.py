@@ -76,7 +76,7 @@ class FilePrep:
     def create_modeling_dataset(self):
         data_labels = self._make_class_df()
         if data_labels.empty:
-            raise ValueError('The data directory {} is empty.'.format(self.image_directory))
+            raise ValueError(f'No file names matching those in class dataframe in the directory {self.image_directory}')
         train_base = os.path.join(self.exp_dir , 'train')
         test_base  = os.path.join(self.exp_dir , 'test')
         valid_base = os.path.join(self.exp_dir , 'validate')
